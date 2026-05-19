@@ -80,20 +80,27 @@ body::before {
   object-fit: cover;
 }
 #video-hint {
-  position: absolute; bottom: 52px; left: 50%;
+  position: absolute; bottom: 80px; left: 50%;
   transform: translateX(-50%);
   font-family: 'Share Tech Mono', monospace;
-  font-size: 15px; letter-spacing: 0.35em;
+  font-size: 22px; letter-spacing: 0.15em;
   text-transform: uppercase; color: var(--neon-gold);
   animation: hint-pulse 2.5s ease-in-out infinite;
   text-shadow: var(--glow-gold);
   white-space: nowrap;
+  
+  /* MODIF: Fond noir pour lisibilité */
+  background: rgba(0, 0, 0, 0.85);
+  padding: 18px 36px;
+  border-radius: 8px;
+  border: 1px solid rgba(255,204,0,0.3);
+  box-shadow: 0 0 40px rgba(0,0,0,0.8);
 }
 #video-hint::before, #video-hint::after {
   content: ' ◆ ';
   opacity: 0.5;
 }
-@keyframes hint-pulse { 0%,100%{opacity:0.3} 50%{opacity:1} }
+@keyframes hint-pulse { 0%,100%{opacity:0.6} 50%{opacity:1; box-shadow: 0 0 60px rgba(255,204,0,0.3), 0 0 40px rgba(0,0,0,0.8);} }
 
 /* ══════════════════════════════════
    APP WRAPPER
@@ -242,7 +249,7 @@ body::before {
   transition: opacity 0.45s ease;
 }
 .arch-panel[data-arch="security-sentinel"]::after { background: radial-gradient(ellipse at center, rgba(255,34,68,0.55), transparent 75%); }
-.arch-panel[data-arch="ai-sorcerer"]::after       { background: radial-gradient(ellipse at center, rgba(255,204,0,0.5), transparent 75%); }
+.arch-panel[data-arch="ai-sorcerer"]::after        { background: radial-gradient(ellipse at center, rgba(255,204,0,0.5), transparent 75%); }
 .arch-panel[data-arch="cloud-architect"]::after   { background: radial-gradient(ellipse at center, rgba(0,229,255,0.4), transparent 75%); }
 .arch-panel[data-arch="data-wrangler"]::after     { background: radial-gradient(ellipse at center, rgba(255,77,143,0.45), transparent 75%); }
 
@@ -254,7 +261,7 @@ body::before {
   transition: opacity 0.3s;
 }
 .arch-panel[data-arch="security-sentinel"] .arch-panel-glow { box-shadow: inset 0 0 40px rgba(255,34,68,0.4), inset 0 0 3px rgba(255,34,68,0.8); }
-.arch-panel[data-arch="ai-sorcerer"] .arch-panel-glow       { box-shadow: inset 0 0 40px rgba(255,204,0,0.4), inset 0 0 3px rgba(255,204,0,0.8); }
+.arch-panel[data-arch="ai-sorcerer"] .arch-panel-glow        { box-shadow: inset 0 0 40px rgba(255,204,0,0.4), inset 0 0 3px rgba(255,204,0,0.8); }
 .arch-panel[data-arch="cloud-architect"] .arch-panel-glow   { box-shadow: inset 0 0 40px rgba(0,229,255,0.35), inset 0 0 3px rgba(0,229,255,0.8); }
 .arch-panel[data-arch="data-wrangler"] .arch-panel-glow     { box-shadow: inset 0 0 40px rgba(255,77,143,0.4), inset 0 0 3px rgba(255,77,143,0.8); }
 .arch-panel:hover .arch-panel-glow { opacity: 1; }
@@ -817,37 +824,30 @@ canvas { display: none; }
 <body>
 <div id="bg"></div>
 
-<!-- ══ FLASH BLANC PHOTO ══ -->
 <div id="flash"></div>
 
-<!-- ══ FLASH BLANC GÉNÉRATION ══ -->
 <div id="gen-white-flash"></div>
 
-<!-- ══ GÉNÉRATION OVERLAY ══ -->
 <div id="gen-overlay">
   <div class="gen-ring"></div>
-  <div class="gen-label">Création de votre avatar…</div>
+  <div class="gen-label" id="gen-label">Conversion de votre photo...</div>
   <div class="gen-sub">Vertex AI · Gemini Image</div>
   <div class="gen-progress-wrap"><div class="gen-progress-bar" id="gen-progress"></div></div>
 </div>
 
-<!-- ══ RÉVÉLATION PLEIN ÉCRAN ══ -->
 <div id="gen-result-reveal">
   <img id="reveal-img" src="" alt="Avatar révélé">
   <button id="gen-result-cta" onclick="confirmReveal()">Voir mon profil →</button>
 </div>
 
-<!-- ══ ÉCRAN VEILLE ══ -->
 <div id="screen-video">
   <video id="idle-video" autoplay loop muted playsinline>
     <source src="https://res.cloudinary.com/dwfblz9nl/video/upload/v1779190938/video_1_km8e4e.mp4" type="video/mp4">
   </video>
-  <div id="video-hint">Touchez l'écran pour commencer</div>
+  <div id="video-hint">CLIQUEZ POUR GÉNÉRER VOTRE AVATAR IA</div>
 </div>
 
-<!-- ══ APPLICATION ══ -->
 <div id="app">
-  <!-- HEADER -->
   <div id="header">
     <button id="btn-home" onclick="goHome()" title="Retour à l'accueil">
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -861,7 +861,6 @@ canvas { display: none; }
 
   <div id="idle-bar"><div id="idle-fill"></div></div>
 
-  <!-- ÉCRAN A : CHOIX -->
   <div class="screen active" id="screen-choose">
     <div class="choose-title">Choisissez votre <em>avatar</em></div>
     <div class="arch-grid">
@@ -892,7 +891,6 @@ canvas { display: none; }
     </div>
   </div>
 
-  <!-- ÉCRAN B : CAPTURE -->
   <div class="screen" id="screen-capture">
     <div class="cap-left">
       <img class="cap-arch-img" id="cap-arch-img" src="" alt="">
@@ -920,7 +918,6 @@ canvas { display: none; }
     </div>
   </div>
 
-  <!-- ÉCRAN C : RÉSULTAT -->
   <div class="screen" id="screen-result">
     <div class="result-left">
       <div class="result-img-wrap" id="result-img-wrap">
@@ -947,10 +944,7 @@ canvas { display: none; }
     </div>
   </div>
 
-</div><!-- #app -->
-
-<!-- ── FORMULAIRE OVERLAY ── -->
-<div id="form-overlay">
+</div><div id="form-overlay">
   <div class="form-card">
     <button class="form-close" onclick="closeForm()">[ ✕ ]</button>
     <div class="form-card-title">Identify</div>
@@ -973,9 +967,6 @@ canvas { display: none; }
   </div>
 </div>
 
-<!-- ══════════════════════════════════
-     AUDIO ENGINE
-══════════════════════════════════ -->
 <audio id="snd-hover"  preload="auto"></audio>
 <audio id="snd-click"  preload="auto"></audio>
 <audio id="snd-shutter" preload="auto"></audio>
@@ -1205,7 +1196,8 @@ function buildPrompt(key) {
   const a = ARCHETYPES[key];
   return `A heroic stylized 3D illustration portrait based on the reference photo.
 CRITICAL: Preserve the exact facial features, skin tone, hair, and ethnicity of the person in the reference image.
-The person is depicted as a ${a.label}, in a Pixar-quality stylized 3D rendering, NOT photorealistic. Heroic three-quarter pose, confident expression.
+IMPORTANT: If there are multiple people in the reference photo, you MUST generate an avatar for EACH person present in the image, transforming all individuals according to the archetype.
+The subject(s) are depicted as ${a.label}, in a Pixar-quality stylized 3D rendering, NOT photorealistic. Heroic three-quarter pose, confident expression.
 Setting: ${a.scene}
 Style: Stylized 3D illustration, cinematic lighting, Google Cloud color accents (#4285F4, #34A853, #FBBC04, #EA4335), portrait orientation 4:5, high detail face and upper body. Suitable for professional sharing.`;
 }
@@ -1216,6 +1208,7 @@ Style: Stylized 3D illustration, cinematic lighting, Google Cloud color accents 
 let selectedArch = null, userName = '', userEmail = '';
 let camStream = null, capturedB64 = null, resultImage = null;
 let idleInterval = null, idleSeconds = 0, countdownInt = null;
+let loadingMsgInterval = null; // Modif: interval pour le texte de chargement
 
 // ════════════════════════════════════════
 //  VEILLE
@@ -1388,8 +1381,26 @@ async function generateAvatar() {
   const whiteFlash = document.getElementById('gen-white-flash');
   whiteFlash.classList.add('flash-in');
   await sleep(140);
+  
+  // Lancement de l'animation du texte d'attente
+  const labelEl = document.getElementById('gen-label');
+  const msgs = [
+    "Conversion de votre photo en base 64...",
+    "Envoi via l'API Vertex AI...",
+    "Génération de votre avatar par Gemini...",
+    "Réception..."
+  ];
+  let msgIdx = 0;
+  labelEl.textContent = msgs[0];
+  if(loadingMsgInterval) clearInterval(loadingMsgInterval);
+  loadingMsgInterval = setInterval(() => {
+    msgIdx++;
+    if(msgIdx < msgs.length) labelEl.textContent = msgs[msgIdx];
+  }, 2000);
+
   // Montre l'overlay de génération derrière
   document.getElementById('gen-overlay').classList.add('show');
+  
   // Fondu du blanc vers transparent
   whiteFlash.classList.remove('flash-in');
   whiteFlash.classList.add('flash-out');
@@ -1419,12 +1430,14 @@ async function generateAvatar() {
     resultData = await res.json();
   } catch(e) {
     clearInterval(genProgressInterval);
+    if(loadingMsgInterval) clearInterval(loadingMsgInterval);
     document.getElementById('gen-overlay').classList.remove('show');
     alert('Erreur réseau : ' + e.message);
     return;
   }
 
   clearInterval(genProgressInterval);
+  if(loadingMsgInterval) clearInterval(loadingMsgInterval);
   bar.style.width = '100%';
   await sleep(400);
 
@@ -1481,7 +1494,10 @@ async function addLogo(base64) {
   c.width=base.width; c.height=base.height;
   const ctx = c.getContext('2d');
   ctx.drawImage(base,0,0);
-  const lw=base.width*0.14, lh=lw*(logo.height/logo.width), m=base.width*0.025;
+  
+  // MODIF : Augmentation de la taille du logo (lw passé de 0.14 à 0.25)
+  const lw=base.width*0.25, lh=lw*(logo.height/logo.width), m=base.width*0.025;
+  
   ctx.globalAlpha=0.82;
   ctx.drawImage(logo, base.width-lw-m, base.height-lh-m, lw, lh);
   ctx.globalAlpha=1;
@@ -1541,6 +1557,7 @@ function resetAll(silent) {
   if (camStream) { camStream.getTracks().forEach(t=>t.stop()); camStream=null; }
   if (countdownInt) { clearInterval(countdownInt); countdownInt=null; }
   if (genProgressInterval) { clearInterval(genProgressInterval); genProgressInterval=null; }
+  if (loadingMsgInterval) { clearInterval(loadingMsgInterval); loadingMsgInterval=null; }
   document.getElementById('countdown-overlay').classList.remove('show');
   document.getElementById('gen-overlay').classList.remove('show');
   document.getElementById('gen-result-reveal').classList.remove('show');
