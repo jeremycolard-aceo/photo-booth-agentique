@@ -21,7 +21,7 @@ html, body { width: 100%; height: 100%; overflow: hidden; background: #ffffff; }
   --orange-ambre:#F6A119;
   --blanc-casse: #F4F5F5;
   --blanc:       #ffffff;
-  
+
   --border:      rgba(38, 47, 99, 0.15);
   --glow-google: 0 0 15px rgba(66, 133, 244, 0.4);
   --glow-ambre:  0 0 15px rgba(246, 161, 25, 0.4);
@@ -255,7 +255,6 @@ body::before {
   position: relative;
   animation: card-appear 0.4s cubic-bezier(0.22,1,0.36,1);
 }
-
 @keyframes card-appear { from{opacity:0;transform:translateY(24px) scale(0.96)} to{opacity:1;transform:translateY(0) scale(1)} }
 
 .form-card-title {
@@ -439,8 +438,7 @@ canvas { display: none; }
 #gen-overlay.show { display: flex; }
 
 .gen-rocket {
-  width: 100px;
-  height: auto;
+  width: 100px; height: auto;
   animation: floatRocket 2.5s ease-in-out infinite;
   margin-bottom: 10px;
 }
@@ -457,7 +455,7 @@ canvas { display: none; }
 #gen-white-flash.flash-out { opacity: 0; transition: opacity 0.8s ease; }
 
 /* ══════════════════════════════════
-   REVEAL CINÉMATIQUE — avec effet lumineux
+   REVEAL CINÉMATIQUE
 ══════════════════════════════════ */
 #gen-result-reveal {
   display: none; position: fixed; inset: 0; z-index: 202;
@@ -466,7 +464,6 @@ canvas { display: none; }
 }
 #gen-result-reveal.show { display: flex; }
 
-/* Wrapper position relative pour superposer canvas de particules */
 #reveal-img-wrapper {
   position: relative;
   display: flex; align-items: center; justify-content: center;
@@ -486,20 +483,14 @@ canvas { display: none; }
   to   { opacity: 1; transform: scale(1); filter: brightness(1) blur(0); }
 }
 
-/* Canvas de particules superposé au reveal */
 #reveal-particles-canvas {
   position: absolute; inset: 0; z-index: 2;
-  pointer-events: none;
-  border-radius: 4px;
+  pointer-events: none; border-radius: 4px;
 }
-
-/* Canvas masque lumineux pour le reveal (pulsation) */
 #reveal-mask-canvas {
   position: absolute; inset: 0; z-index: 3;
-  pointer-events: none;
-  border-radius: 4px;
-  opacity: 0;
-  mix-blend-mode: screen;
+  pointer-events: none; border-radius: 4px;
+  opacity: 0; mix-blend-mode: screen;
   transition: opacity 0.6s ease;
 }
 #reveal-mask-canvas.active { opacity: 1; }
@@ -550,13 +541,11 @@ canvas { display: none; }
   overflow: hidden;
 }
 
-/* Canvas particules en fond de la zone gauche */
 #particles-canvas {
   position: absolute; inset: 0; z-index: 0;
   pointer-events: none;
 }
 
-/* Wrapper de la carte avec perspective pour le tilt */
 .card-tilt-wrapper {
   position: relative; z-index: 1;
   width: 100%; max-width: 420px;
@@ -564,126 +553,74 @@ canvas { display: none; }
   cursor: default;
 }
 
-/* ── TRADING CARD STYLISÉE ── */
+/* ── TRADING CARD ── */
 .hero-card {
-  position: relative;
-  width: 100%;
-  aspect-ratio: 3/4;
-  border-radius: 16px;
-  overflow: hidden;
+  position: relative; width: 100%; aspect-ratio: 3/4;
+  border-radius: 16px; overflow: hidden;
   transform-style: preserve-3d;
   transition: transform 0.12s ease-out, box-shadow 0.12s ease-out;
-  box-shadow:
-    0 20px 60px rgba(38, 47, 99, 0.35),
-    0 4px 16px rgba(38, 47, 99, 0.15);
+  box-shadow: 0 20px 60px rgba(38, 47, 99, 0.35), 0 4px 16px rgba(38, 47, 99, 0.15);
   will-change: transform;
 }
-
-/* Photo générée prend toute la carte */
 .hero-card .card-photo {
-  position: absolute; inset: 0;
-  width: 100%; height: 100%;
+  position: absolute; inset: 0; width: 100%; height: 100%;
   object-fit: cover; display: block;
 }
-
-/* Canvas masque de pulsation lumineuse sur la carte */
 #card-pulse-canvas {
   position: absolute; inset: 0; z-index: 2;
-  pointer-events: none;
-  border-radius: 16px;
+  pointer-events: none; border-radius: 16px;
   mix-blend-mode: screen;
 }
-
-/* Canvas de particules sur la carte (dessus du masque) */
 #card-particles-overlay {
   position: absolute; inset: 0; z-index: 3;
-  pointer-events: none;
-  border-radius: 16px;
+  pointer-events: none; border-radius: 16px;
 }
-
-/* Reflet holographique qui suit la souris */
 .hero-card .card-shine {
   position: absolute; inset: 0; z-index: 4;
-  background: radial-gradient(
-    circle at var(--mx, 50%) var(--my, 50%),
-    rgba(255,255,255,0.18) 0%,
-    rgba(255,255,255,0.06) 30%,
-    transparent 65%
-  );
-  border-radius: 16px;
-  pointer-events: none;
-  transition: background 0.08s;
-  mix-blend-mode: screen;
+  background: radial-gradient(circle at var(--mx, 50%) var(--my, 50%),
+    rgba(255,255,255,0.18) 0%, rgba(255,255,255,0.06) 30%, transparent 65%);
+  border-radius: 16px; pointer-events: none;
+  transition: background 0.08s; mix-blend-mode: screen;
 }
-
-/* Overlay dégradé bas de carte */
 .hero-card .card-overlay {
   position: absolute; inset: 0; z-index: 5;
-  background: linear-gradient(
-    to bottom,
-    transparent 45%,
-    rgba(38, 47, 99, 0.55) 70%,
-    rgba(38, 47, 99, 0.92) 100%
-  );
+  background: linear-gradient(to bottom, transparent 45%, rgba(38, 47, 99, 0.55) 70%, rgba(38, 47, 99, 0.92) 100%);
 }
-
-/* Contenu texte de la carte */
 .hero-card .card-content {
   position: absolute; bottom: 0; left: 0; right: 0; z-index: 6;
   padding: 20px 22px 22px;
 }
-
-/* Badge archétype */
 .hero-card .card-badge {
-  display: inline-block;
-  font-family: 'Share Tech Mono', monospace;
+  display: inline-block; font-family: 'Share Tech Mono', monospace;
   font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase;
-  padding: 5px 12px;
-  background: var(--bleu-google);
-  color: var(--blanc);
-  border-radius: 3px;
-  margin-bottom: 8px;
+  padding: 5px 12px; background: var(--bleu-google);
+  color: var(--blanc); border-radius: 3px; margin-bottom: 8px;
 }
-
-/* Nom sur la carte */
 .hero-card .card-name {
   font-family: 'Black Ops One', cursive;
-  font-size: clamp(22px, 2.8vw, 36px);
-  color: var(--blanc);
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  line-height: 1;
-  text-shadow: 0 2px 8px rgba(0,0,0,0.6);
+  font-size: clamp(22px, 2.8vw, 36px); color: var(--blanc);
+  text-transform: uppercase; letter-spacing: 0.04em;
+  line-height: 1; text-shadow: 0 2px 8px rgba(0,0,0,0.6);
 }
-
-/* Sous-titre archétype */
 .hero-card .card-arch {
   font-family: 'Share Tech Mono', monospace;
   font-size: 13px; letter-spacing: 0.1em;
-  color: rgba(255,255,255,0.7);
-  text-transform: uppercase;
-  margin-top: 4px;
+  color: rgba(255,255,255,0.7); text-transform: uppercase; margin-top: 4px;
 }
-
-/* Logo ACEO en bas à droite de la carte */
 .hero-card .card-logo {
   position: absolute; bottom: 18px; right: 18px; z-index: 7;
   height: 36px; opacity: 0.95;
 }
-
-/* Bordure brillante de la carte */
 .hero-card::before {
-  content: '';
-  position: absolute; inset: 0; z-index: 8;
-  border-radius: 16px;
-  border: 1.5px solid rgba(255,255,255,0.25);
+  content: ''; position: absolute; inset: 0; z-index: 8;
+  border-radius: 16px; border: 1.5px solid rgba(255,255,255,0.25);
   pointer-events: none;
 }
 
 /* ── ZONE DROITE — actions + leaderboard ── */
 .result-right {
   flex: 1; display: flex; flex-direction: column; justify-content: center;
-  padding: 32px 44px 32px 28px; gap: 16px;
+  padding: 32px 44px 32px 28px; gap: 16px; overflow-y: auto;
 }
 .result-eyebrow {
   font-family: 'Share Tech Mono', monospace; font-size: 14px;
@@ -728,91 +665,163 @@ canvas { display: none; }
    LEADERBOARD
 ══════════════════════════════════ */
 .leaderboard {
-  background: var(--blanc-casse);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 16px 20px;
-  flex-shrink: 0;
+  background: var(--blanc-casse); border: 1px solid var(--border);
+  border-radius: 8px; padding: 16px 20px; flex-shrink: 0;
 }
 .leaderboard-title {
   font-family: 'Share Tech Mono', monospace;
   font-size: 11px; font-weight: bold;
   letter-spacing: 0.15em; text-transform: uppercase;
-  color: var(--bleu-canard);
-  margin-bottom: 12px;
+  color: var(--bleu-canard); margin-bottom: 12px;
   display: flex; align-items: center; gap: 8px;
 }
-.leaderboard-title::after {
-  content: '';
-  flex: 1; height: 1px;
-  background: var(--border);
-}
+.leaderboard-title::after { content: ''; flex: 1; height: 1px; background: var(--border); }
 
-.lb-row {
-  display: flex; align-items: center; gap: 10px;
-  margin-bottom: 8px;
-}
+.lb-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
 .lb-row:last-child { margin-bottom: 0; }
-
-.lb-rank {
-  font-family: 'Share Tech Mono', monospace;
-  font-size: 11px; color: rgba(38,47,99,0.4);
-  width: 18px; text-align: center; flex-shrink: 0;
-}
+.lb-rank { font-family: 'Share Tech Mono', monospace; font-size: 11px; color: rgba(38,47,99,0.4); width: 18px; text-align: center; flex-shrink: 0; }
 .lb-rank.gold   { color: #e8a020; font-weight: bold; }
 .lb-rank.silver { color: #888; font-weight: bold; }
 .lb-rank.bronze { color: #b06020; font-weight: bold; }
-
-.lb-label {
-  font-family: 'Share Tech Mono', monospace;
-  font-size: 12px; text-transform: uppercase;
-  letter-spacing: 0.06em; color: var(--bleu-nuit);
-  flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-}
-.lb-label.active-arch {
-  color: var(--bleu-google);
-}
-
-.lb-bar-wrap {
-  flex: 2; height: 6px; background: rgba(38,47,99,0.08);
-  border-radius: 3px; overflow: hidden;
-}
-.lb-bar {
-  height: 100%; border-radius: 3px;
-  background: linear-gradient(90deg, var(--bleu-google), #74a8ff);
-  transition: width 1.2s cubic-bezier(0.22,1,0.36,1);
-  width: 0%;
-}
-.lb-bar.active-bar {
-  background: linear-gradient(90deg, var(--orange-ambre), #fbd07a);
-}
-
-.lb-count {
-  font-family: 'Black Ops One', cursive;
-  font-size: 15px; color: var(--bleu-nuit);
-  min-width: 28px; text-align: right; flex-shrink: 0;
-}
+.lb-label { font-family: 'Share Tech Mono', monospace; font-size: 12px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--bleu-nuit); flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.lb-label.active-arch { color: var(--bleu-google); }
+.lb-bar-wrap { flex: 2; height: 6px; background: rgba(38,47,99,0.08); border-radius: 3px; overflow: hidden; }
+.lb-bar { height: 100%; border-radius: 3px; background: linear-gradient(90deg, var(--bleu-google), #74a8ff); transition: width 1.2s cubic-bezier(0.22,1,0.36,1); width: 0%; }
+.lb-bar.active-bar { background: linear-gradient(90deg, var(--orange-ambre), #fbd07a); }
+.lb-count { font-family: 'Black Ops One', cursive; font-size: 15px; color: var(--bleu-nuit); min-width: 28px; text-align: right; flex-shrink: 0; }
 .lb-count.active-count { color: var(--bleu-google); }
+.lb-total { font-family: 'Share Tech Mono', monospace; font-size: 11px; color: rgba(38,47,99,0.45); text-align: right; margin-top: 10px; border-top: 1px solid var(--border); padding-top: 8px; }
+.lb-loading { font-family: 'Share Tech Mono', monospace; font-size: 12px; color: var(--bleu-canard); text-align: center; padding: 8px 0; animation: sub-blink 1.6s ease-in-out infinite; }
 
-.lb-total {
+/* ══════════════════════════════════
+   CARROUSEL GALERIE DRIVE
+══════════════════════════════════ */
+.gallery-section {
+  border-top: 1px solid var(--border);
+  padding-top: 14px;
+  flex-shrink: 0;
+}
+.gallery-title {
   font-family: 'Share Tech Mono', monospace;
-  font-size: 11px; color: rgba(38,47,99,0.45);
-  text-align: right; margin-top: 10px;
-  border-top: 1px solid var(--border); padding-top: 8px;
+  font-size: 11px; font-weight: bold;
+  letter-spacing: 0.15em; text-transform: uppercase;
+  color: var(--bleu-canard); margin-bottom: 12px;
+  display: flex; align-items: center; gap: 8px;
+}
+.gallery-title::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+/* Wrapper scroll horizontal */
+.gallery-carousel {
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: 8px;
+  /* Masque la scrollbar mais garde la fonctionnalité */
+  scrollbar-width: thin;
+  scrollbar-color: var(--bleu-google) transparent;
+}
+.gallery-carousel::-webkit-scrollbar { height: 3px; }
+.gallery-carousel::-webkit-scrollbar-track { background: transparent; }
+.gallery-carousel::-webkit-scrollbar-thumb { background: var(--bleu-google); border-radius: 2px; }
+
+.gallery-item {
+  flex-shrink: 0;
+  width: 72px; height: 72px;
+  border-radius: 6px;
+  overflow: hidden;
+  scroll-snap-align: start;
+  position: relative;
+  cursor: pointer;
+  border: 2px solid transparent;
+  transition: border-color 0.2s, transform 0.2s;
+}
+.gallery-item:hover { border-color: var(--bleu-google); transform: scale(1.06); }
+.gallery-item.is-mine { border-color: var(--orange-ambre); }
+.gallery-item.is-mine::after {
+  content: '★';
+  position: absolute; top: 2px; right: 4px;
+  font-size: 10px; color: var(--orange-ambre);
+  text-shadow: 0 0 4px rgba(0,0,0,0.8);
+  z-index: 2;
 }
 
-.lb-loading {
-  font-family: 'Share Tech Mono', monospace;
-  font-size: 12px; color: var(--bleu-canard);
-  text-align: center; padding: 8px 0;
-  animation: sub-blink 1.6s ease-in-out infinite;
+.gallery-item img {
+  display: block;           /* ← important : évite l'espace parasite sous l'image */
+  width: 100%; height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s;
 }
+.gallery-item:hover img { transform: scale(1.1); }
+
+/* Lightbox survol */
+.gallery-lightbox-hint {
+  position: absolute; inset: 0; z-index: 3;
+  background: rgba(38, 47, 99, 0.5);
+  display: flex; align-items: center; justify-content: center;
+  opacity: 0; transition: opacity 0.2s;
+  font-size: 18px;
+}
+.gallery-item:hover .gallery-lightbox-hint { opacity: 1; }
+
+/* Navigation prev/next */
+.gallery-nav {
+  display: flex; gap: 6px; margin-top: 8px;
+}
+.gallery-nav-btn {
+  background: var(--blanc-casse); border: 1px solid var(--border);
+  border-radius: 4px; width: 28px; height: 28px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; transition: all 0.2s;
+  font-size: 12px; color: var(--bleu-nuit);
+}
+.gallery-nav-btn:hover { background: var(--bleu-google); color: var(--blanc); border-color: var(--bleu-google); }
+
+.gallery-loading {
+  font-family: 'Share Tech Mono', monospace; font-size: 11px;
+  color: var(--bleu-canard); animation: sub-blink 1.6s ease-in-out infinite;
+  padding: 8px 0;
+}
+.gallery-empty {
+  font-family: 'Share Tech Mono', monospace; font-size: 11px;
+  color: rgba(38,47,99,0.4); padding: 8px 0;
+}
+
+/* ══════════════════════════════════
+   LIGHTBOX (plein écran)
+══════════════════════════════════ */
+#gallery-lightbox {
+  display: none;
+  position: fixed; inset: 0; z-index: 300;
+  background: rgba(38, 47, 99, 0.95);
+  align-items: center; justify-content: center;
+  cursor: zoom-out;
+}
+#gallery-lightbox.open { display: flex; }
+#gallery-lightbox img {
+  max-width: 85vw; max-height: 85vh;
+  object-fit: contain; border-radius: 8px;
+  border: 2px solid var(--blanc);
+  box-shadow: 0 0 60px rgba(0,0,0,0.7);
+  animation: lb-pop 0.3s cubic-bezier(0.22,1,0.36,1);
+}
+@keyframes lb-pop { from{opacity:0;transform:scale(0.88)} to{opacity:1;transform:scale(1)} }
+#gallery-lightbox-close {
+  position: absolute; top: 20px; right: 28px;
+  font-family: 'Share Tech Mono', monospace; font-size: 28px;
+  color: rgba(255,255,255,0.7); cursor: pointer; line-height: 1;
+}
+#gallery-lightbox-close:hover { color: var(--blanc); }
 </style>
 </head>
 <body>
 <div id="bg"></div>
 <div id="flash"></div>
 <div id="gen-white-flash"></div>
+
+<!-- OVERLAY GÉNÉRATION -->
 <div id="gen-overlay">
   <img src="fusee-aceo-transparent.png" alt="Fusée ACEO" class="gen-rocket" onerror="this.style.display='none'">
   <div class="gen-label" id="gen-label">Conversion de votre photo...</div>
@@ -820,6 +829,7 @@ canvas { display: none; }
   <div class="gen-progress-wrap"><div class="gen-progress-bar" id="gen-progress"></div></div>
 </div>
 
+<!-- REVEAL CINÉMATIQUE -->
 <div id="gen-result-reveal">
   <div id="reveal-img-wrapper">
     <img id="reveal-img" src="" alt="Avatar révélé">
@@ -829,6 +839,7 @@ canvas { display: none; }
   <button id="gen-result-cta" onclick="confirmReveal()">Voir mon profil →</button>
 </div>
 
+<!-- ÉCRAN VEILLE -->
 <div id="screen-video">
   <video id="idle-video" autoplay loop muted playsinline>
     <source src="https://res.cloudinary.com/dwfblz9nl/video/upload/v1779201350/Untitled_Scene_05-19_14_24_53_202605191628_rufjt2.mp4" type="video/mp4">
@@ -836,6 +847,7 @@ canvas { display: none; }
   <div id="video-hint">CLIQUEZ POUR GÉNÉRER VOTRE AVATAR IA</div>
 </div>
 
+<!-- APP PRINCIPALE -->
 <div id="app">
   <div id="header">
     <button id="btn-home" onclick="goHome()" title="Retour à l'accueil">
@@ -844,57 +856,61 @@ canvas { display: none; }
         <polyline points="9 22 9 12 15 12 15 22"/>
       </svg>
     </button>
-    <img class="logo-aceo" src="https://raw.githubusercontent.com/jeremycolard-aceo/photo-booth-agentique/main/logo-aceo.png" alt="ACEO Tech" onerror="this.style.display='none'">
+    <img class="logo-aceo"
+         src="https://raw.githubusercontent.com/jeremycolard-aceo/photo-booth-agentique/main/logo-aceo.png"
+         alt="ACEO Tech" onerror="this.style.display='none'">
     <span class="header-tag">◆ Google Cloud Summit 2026 ◆</span>
   </div>
 
   <div id="idle-bar"><div id="idle-fill"></div></div>
 
+  <!-- ÉCRAN A : CHOIX ARCHÉTYPE -->
   <div class="screen active" id="screen-choose">
     <div class="choose-title">Choisissez votre <em>avatar</em></div>
     <div class="arch-grid">
-  <div class="arch-panel" data-arch="security-sentinel" onclick="onArchClick(this)"
-       onmouseenter="playArchVideo(this)" onmouseleave="pauseArchVideo(this)">
-    <video src="https://res.cloudinary.com/dayss50y9/video/upload/v1779697682/SENTINELLE_flwkop.mp4"
-           muted playsinline loop preload="metadata"></video>
-    <div class="arch-panel-glow"></div>
-    <div class="arch-tag">SENTINEL</div>
-    <div class="arch-label">Security Sentinel</div>
-  </div>
-  <div class="arch-panel" data-arch="ai-sorcerer" onclick="onArchClick(this)"
-       onmouseenter="playArchVideo(this)" onmouseleave="pauseArchVideo(this)">
-    <video src="https://res.cloudinary.com/dayss50y9/video/upload/v1779697681/de_m%C3%AAme_avec_cette_image_a8uegn.mp4"
-           muted playsinline loop preload="metadata"></video>
-    <div class="arch-panel-glow"></div>
-    <div class="arch-tag">SORCIER</div>
-    <div class="arch-label">AI Sorcerer</div>
-  </div>
-  <div class="arch-panel" data-arch="cloud-architect" onclick="onArchClick(this)"
-       onmouseenter="playArchVideo(this)" onmouseleave="pauseArchVideo(this)">
-    <video src="https://res.cloudinary.com/dayss50y9/video/upload/v1779697141/CLOUDARCHITECT_q22kix.mp4"
-           muted playsinline loop preload="metadata"></video>
-    <div class="arch-panel-glow"></div>
-    <div class="arch-tag">ARCHITECTE</div>
-    <div class="arch-label">Cloud Architect</div>
-  </div>
-  <div class="arch-panel" data-arch="data-wrangler" onclick="onArchClick(this)"
-       onmouseenter="playArchVideo(this)" onmouseleave="pauseArchVideo(this)">
-    <video src="https://res.cloudinary.com/dayss50y9/video/upload/v1779697141/DATAWRANGLER_jvhosa.mp4"
-           muted playsinline loop preload="metadata"></video>
-    <div class="arch-panel-glow"></div>
-    <div class="arch-tag">WRANGLER</div>
-    <div class="arch-label">Data Wrangler</div>
-  </div>
-</div>
+      <div class="arch-panel" data-arch="security-sentinel" onclick="onArchClick(this)"
+           onmouseenter="playArchVideo(this)" onmouseleave="pauseArchVideo(this)">
+        <video src="https://res.cloudinary.com/dayss50y9/video/upload/v1779697682/SENTINELLE_flwkop.mp4"
+               muted playsinline loop preload="metadata"></video>
+        <div class="arch-panel-glow"></div>
+        <div class="arch-tag">SENTINEL</div>
+        <div class="arch-label">Security Sentinel</div>
+      </div>
+      <div class="arch-panel" data-arch="ai-sorcerer" onclick="onArchClick(this)"
+           onmouseenter="playArchVideo(this)" onmouseleave="pauseArchVideo(this)">
+        <video src="https://res.cloudinary.com/dayss50y9/video/upload/v1779697681/de_m%C3%AAme_avec_cette_image_a8uegn.mp4"
+               muted playsinline loop preload="metadata"></video>
+        <div class="arch-panel-glow"></div>
+        <div class="arch-tag">SORCIER</div>
+        <div class="arch-label">AI Sorcerer</div>
+      </div>
+      <div class="arch-panel" data-arch="cloud-architect" onclick="onArchClick(this)"
+           onmouseenter="playArchVideo(this)" onmouseleave="pauseArchVideo(this)">
+        <video src="https://res.cloudinary.com/dayss50y9/video/upload/v1779697141/CLOUDARCHITECT_q22kix.mp4"
+               muted playsinline loop preload="metadata"></video>
+        <div class="arch-panel-glow"></div>
+        <div class="arch-tag">ARCHITECTE</div>
+        <div class="arch-label">Cloud Architect</div>
+      </div>
+      <div class="arch-panel" data-arch="data-wrangler" onclick="onArchClick(this)"
+           onmouseenter="playArchVideo(this)" onmouseleave="pauseArchVideo(this)">
+        <video src="https://res.cloudinary.com/dayss50y9/video/upload/v1779697141/DATAWRANGLER_jvhosa.mp4"
+               muted playsinline loop preload="metadata"></video>
+        <div class="arch-panel-glow"></div>
+        <div class="arch-tag">WRANGLER</div>
+        <div class="arch-label">Data Wrangler</div>
+      </div>
+    </div>
   </div>
 
+  <!-- ÉCRAN B : CAPTURE -->
   <div class="screen" id="screen-capture">
     <div class="cap-left">
-  <video class="cap-arch-img" id="cap-arch-video"
-         muted playsinline loop autoplay
-         style="width:100%;height:100%;object-fit:cover;object-position:center top;display:block;"></video>
-  <div class="cap-arch-label" id="cap-arch-label"></div>
-</div>
+      <video class="cap-arch-img" id="cap-arch-video"
+             muted playsinline loop autoplay
+             style="width:100%;height:100%;object-fit:cover;object-position:center top;display:block;"></video>
+      <div class="cap-arch-label" id="cap-arch-label"></div>
+    </div>
     <div class="cap-right">
       <div class="cam-wrapper" id="cam-wrapper">
         <video id="cam-video" autoplay playsinline muted></video>
@@ -912,7 +928,7 @@ canvas { display: none; }
     </div>
   </div>
 
-  <!-- ── ÉCRAN RÉSULTAT ── -->
+  <!-- ÉCRAN C : RÉSULTAT -->
   <div class="screen" id="screen-result">
 
     <!-- Zone gauche : particules + trading card tiltable -->
@@ -921,9 +937,7 @@ canvas { display: none; }
       <div class="card-tilt-wrapper" id="card-tilt-wrapper">
         <div class="hero-card" id="hero-card">
           <img class="card-photo" id="result-img" src="" alt="Votre avatar">
-          <!-- Canvas pulsation lumineuse sur la carte -->
           <canvas id="card-pulse-canvas"></canvas>
-          <!-- Canvas particules sur la carte -->
           <canvas id="card-particles-overlay"></canvas>
           <div class="card-overlay"></div>
           <div class="card-shine" id="card-shine"></div>
@@ -932,12 +946,14 @@ canvas { display: none; }
             <div class="card-name" id="card-name">Prénom</div>
             <div class="card-arch" id="card-arch-sub">Archétype</div>
           </div>
-          <img class="card-logo" src="https://raw.githubusercontent.com/jeremycolard-aceo/photo-booth-agentique/main/logo-aceo.png" alt="ACEO" onerror="this.style.display='none'">
+          <img class="card-logo"
+               src="https://raw.githubusercontent.com/jeremycolard-aceo/photo-booth-agentique/main/logo-aceo.png"
+               alt="ACEO" onerror="this.style.display='none'">
         </div>
       </div>
     </div>
 
-    <!-- Zone droite : infos + actions + leaderboard -->
+    <!-- Zone droite : infos + actions + leaderboard + galerie -->
     <div class="result-right">
       <div class="result-eyebrow">◆ Votre Google Cloud Hero ◆</div>
       <div class="result-title"><em id="res-name-em">Prénom</em>est prêt.</div>
@@ -962,11 +978,20 @@ canvas { display: none; }
         <div id="lb-content"><div class="lb-loading">Chargement des stats…</div></div>
         <div class="lb-total" id="lb-total" style="display:none;"></div>
       </div>
+
+      <!-- Galerie Drive carrousel -->
+      <div class="gallery-section" id="gallery-section">
+        <div class="gallery-title">◆ Galerie du stand</div>
+        <div id="gallery-inner">
+          <div class="gallery-loading">Chargement des avatars…</div>
+        </div>
+      </div>
     </div>
 
   </div>
 </div>
 
+<!-- FORMULAIRE OVERLAY -->
 <div id="form-overlay">
   <div class="form-card">
     <button class="form-close" onclick="closeForm()">✕</button>
@@ -990,8 +1015,15 @@ canvas { display: none; }
   </div>
 </div>
 
-<audio id="snd-hover"  preload="auto"></audio>
-<audio id="snd-click"  preload="auto"></audio>
+<!-- LIGHTBOX -->
+<div id="gallery-lightbox" onclick="closeLightbox()">
+  <span id="gallery-lightbox-close" onclick="closeLightbox()">✕</span>
+  <img id="gallery-lightbox-img" src="" alt="Avatar agrandi">
+</div>
+
+<!-- Audio éléments -->
+<audio id="snd-hover"   preload="auto"></audio>
+<audio id="snd-click"   preload="auto"></audio>
 <audio id="snd-shutter" preload="auto"></audio>
 <audio id="snd-reveal"  preload="auto"></audio>
 <audio id="snd-ambient" loop preload="auto"></audio>
@@ -1005,9 +1037,7 @@ const SECRET   = 'ton-uuid-secret';
 const LOGO_URL = 'https://raw.githubusercontent.com/jeremycolard-aceo/photo-booth-agentique/main/logo-aceo.png';
 const IDLE_TIMEOUT = 120;
 
-// Seuil de luminosité pour l'effet particules (75% de 255)
 const BRIGHTNESS_THRESHOLD = 191;
-// Couleurs des particules : bleu google et orange ambre ACEO
 const PARTICLE_COLORS = ['66,133,244', '246,161,25', '255,255,255'];
 
 // ════════════════════════════════════════
@@ -1044,6 +1074,7 @@ function playSynthClick() {
     osc.start(); osc.stop(ctx.currentTime + 0.15);
   } catch(e) {}
 }
+
 function playArchVideo(panel) {
   const v = panel.querySelector('video');
   if (v) v.play().catch(() => {});
@@ -1052,6 +1083,7 @@ function pauseArchVideo(panel) {
   const v = panel.querySelector('video');
   if (v) v.pause();
 }
+
 function playSynthShutter() {
   try {
     const ctx = getAudio();
@@ -1146,6 +1178,7 @@ function buildPrompt(key) {
 // ════════════════════════════════════════
 let selectedArch = null, userName = '', userEmail = '';
 let camStream = null, capturedB64 = null, resultImage = null;
+let currentFileId = null; // ID Drive du fichier généré
 let idleInterval = null, idleSeconds = 0, countdownInt = null, loadingMsgInterval = null;
 
 // ════════════════════════════════════════
@@ -1201,7 +1234,8 @@ function onArchClick(panel) {
   resumeAudio(); playSynthClick();
   selectedArch = panel.dataset.arch;
   document.getElementById('form-arch-name').textContent = ARCHETYPES[selectedArch].label;
-  document.getElementById('f-nom').value = ''; document.getElementById('f-email').value = '';
+  document.getElementById('f-nom').value = '';
+  document.getElementById('f-email').value = '';
   document.getElementById('f-consent').checked = false;
   document.getElementById('btn-validate').disabled = true;
   document.getElementById('form-overlay').classList.add('open');
@@ -1210,16 +1244,19 @@ function onArchClick(panel) {
 function closeForm() { document.getElementById('form-overlay').classList.remove('open'); }
 function toggleConsent() { const cb = document.getElementById('f-consent'); cb.checked = !cb.checked; checkForm(); }
 function checkForm() {
-  const nom = document.getElementById('f-nom').value.trim();
+  const nom   = document.getElementById('f-nom').value.trim();
   const email = document.getElementById('f-email').value.trim();
-  const ok = nom.length >= 2 && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) && document.getElementById('f-consent').checked;
+  const ok    = nom.length >= 2 && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) && document.getElementById('f-consent').checked;
   document.getElementById('btn-validate').disabled = !ok;
 }
 function submitForm() {
-  userName = document.getElementById('f-nom').value.trim(); userEmail = document.getElementById('f-email').value.trim();
+  userName  = document.getElementById('f-nom').value.trim();
+  userEmail = document.getElementById('f-email').value.trim();
   closeForm(); goCapture();
-  fetch(API_URL, {method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},
-    body:JSON.stringify({action:'logUser',secret:SECRET,nom:userName,email:userEmail,archetype:selectedArch})
+  fetch(API_URL, {
+    method: 'POST',
+    headers: {'Content-Type': 'text/plain;charset=utf-8'},
+    body: JSON.stringify({ action: 'logUser', secret: SECRET, nom: userName, email: userEmail, archetype: selectedArch })
   }).catch(()=>{});
 }
 
@@ -1233,19 +1270,21 @@ async function goCapture() {
   capVideo.play().catch(() => {});
   document.getElementById('cap-arch-label').textContent = arch.label;
   document.getElementById('cap-username').textContent = userName;
-  showScreen('screen-capture'); await initCam();
+  showScreen('screen-capture');
+  await initCam();
 }
 async function initCam() {
-  if (camStream) { camStream.getTracks().forEach(t=>t.stop()); camStream=null; }
+  if (camStream) { camStream.getTracks().forEach(t=>t.stop()); camStream = null; }
   try {
-    camStream = await navigator.mediaDevices.getUserMedia({video:{width:1280,height:720},audio:false});
+    camStream = await navigator.mediaDevices.getUserMedia({ video: { width: 1280, height: 720 }, audio: false });
     document.getElementById('cam-video').srcObject = camStream;
-  } catch(e) { alert('Caméra inaccessible : '+e.message); }
+  } catch(e) { alert('Caméra inaccessible : ' + e.message); }
 }
 function startCountdown() {
   if (countdownInt) return; resumeAudio();
   const btn = document.getElementById('btn-shutter'); btn.style.pointerEvents = 'none';
-  const overlay = document.getElementById('countdown-overlay'); const numEl = document.getElementById('countdown-num');
+  const overlay = document.getElementById('countdown-overlay');
+  const numEl   = document.getElementById('countdown-num');
   overlay.classList.add('show');
   let count = 3; numEl.textContent = count; playSynthHover();
   countdownInt = setInterval(() => {
@@ -1262,13 +1301,14 @@ function startCountdown() {
 }
 function takePhoto() {
   playSynthShutter();
-  const vid = document.getElementById('cam-video'); const c = document.getElementById('canvas');
+  const vid = document.getElementById('cam-video');
+  const c   = document.getElementById('canvas');
   c.width = vid.videoWidth; c.height = vid.videoHeight;
-  const ctx = c.getContext('2d'); ctx.translate(c.width,0); ctx.scale(-1,1); ctx.drawImage(vid,0,0);
+  const ctx = c.getContext('2d'); ctx.translate(c.width, 0); ctx.scale(-1, 1); ctx.drawImage(vid, 0, 0);
   capturedB64 = c.toDataURL('image/jpeg', 0.85);
   const fl = document.getElementById('flash'); fl.classList.add('go');
   setTimeout(()=>fl.classList.remove('go'), 180);
-  if (camStream) { camStream.getTracks().forEach(t=>t.stop()); camStream=null; }
+  if (camStream) { camStream.getTracks().forEach(t=>t.stop()); camStream = null; }
   generateAvatar();
 }
 
@@ -1276,17 +1316,25 @@ function takePhoto() {
 //  GÉNÉRATION
 // ════════════════════════════════════════
 let genProgressInterval = null;
+
 async function generateAvatar() {
   const whiteFlash = document.getElementById('gen-white-flash');
   whiteFlash.classList.add('flash-in'); await sleep(140);
-  
+
   const labelEl = document.getElementById('gen-label');
-  const msgs = ["Conversion de votre photo...", "Envoi via l'API Vertex AI...", "Génération par Gemini...", "Réception..."];
+  const msgs = [
+    "Conversion de votre photo...",
+    "Envoi via l'API Vertex AI...",
+    "Génération par Gemini...",
+    "Sauvegarde dans Google Drive...",
+    "Finalisation..."
+  ];
   let msgIdx = 0; labelEl.textContent = msgs[0];
-  if(loadingMsgInterval) clearInterval(loadingMsgInterval);
+  if (loadingMsgInterval) clearInterval(loadingMsgInterval);
   loadingMsgInterval = setInterval(() => {
-    msgIdx++; if(msgIdx < msgs.length) labelEl.textContent = msgs[msgIdx];
-  }, 2000);
+    msgIdx++;
+    if (msgIdx < msgs.length) labelEl.textContent = msgs[msgIdx];
+  }, 2200);
 
   document.getElementById('gen-overlay').classList.add('show');
   whiteFlash.classList.remove('flash-in'); whiteFlash.classList.add('flash-out');
@@ -1302,224 +1350,178 @@ async function generateAvatar() {
   let resultData;
   try {
     const res = await fetch(API_URL, {
-      method: 'POST', headers: {'Content-Type':'text/plain;charset=utf-8'},
-      body: JSON.stringify({ action: 'transform', secret: SECRET, image: capturedB64, prompt: buildPrompt(selectedArch), archetype: selectedArch })
+      method: 'POST',
+      headers: {'Content-Type': 'text/plain;charset=utf-8'},
+      body: JSON.stringify({
+        action:    'transform',
+        secret:    SECRET,
+        image:     capturedB64,
+        prompt:    buildPrompt(selectedArch),
+        archetype: selectedArch,
+        nom:       userName   // ← transmis pour le nom du fichier Drive
+      })
     });
     resultData = await res.json();
   } catch(e) {
-    clearInterval(genProgressInterval); if(loadingMsgInterval) clearInterval(loadingMsgInterval);
+    clearInterval(genProgressInterval);
+    if (loadingMsgInterval) clearInterval(loadingMsgInterval);
     document.getElementById('gen-overlay').classList.remove('show');
-    alert('Erreur réseau : ' + e.message); return;
+    alert('Erreur réseau : ' + e.message);
+    return;
   }
 
-  clearInterval(genProgressInterval); if(loadingMsgInterval) clearInterval(loadingMsgInterval);
+  clearInterval(genProgressInterval);
+  if (loadingMsgInterval) clearInterval(loadingMsgInterval);
   bar.style.width = '100%'; await sleep(400);
   document.getElementById('gen-overlay').classList.remove('show');
 
-  if (!resultData.success) { alert('Erreur génération : ' + (resultData.error||'inconnue')); return; }
+  if (!resultData.success) {
+    alert('Erreur génération : ' + (resultData.error || 'inconnue'));
+    return;
+  }
 
-  try { resultImage = await addLogo(resultData.image); } catch { resultImage = resultData.image; }
+  // Stocke l'ID Drive reçu depuis Apps Script
+  currentFileId = resultData.fileId || null;
+
+  try { resultImage = await addLogo(resultData.image); }
+  catch { resultImage = resultData.image; }
+
   await cinemaReveal(resultImage);
 }
 
 // ════════════════════════════════════════
-//  EFFET LUMINEUX — CŒUR DE LA MAGIE
-//  Analyse l'image, trouve les zones > 75% de luminosité,
-//  génère un masque pulsant et des particules qui en émanent
+//  EFFET LUMINEUX
 // ════════════════════════════════════════
-
-/**
- * Analyse une image (src base64) et retourne la liste des pixels brillants
- * @param {string} imgSrc - URL ou base64 de l'image
- * @param {number} w - largeur cible pour l'analyse (réduit pour perf)
- * @param {number} h - hauteur cible pour l'analyse
- * @returns {Promise<{brightPixels: Array, maskCanvas: HTMLCanvasElement}>}
- */
 async function buildLightMask(imgSrc, w, h) {
   const img = await loadImg(imgSrc);
-  
-  // Canvas d'analyse (taille réduite pour perf)
   const analyseCanvas = document.createElement('canvas');
   analyseCanvas.width = w; analyseCanvas.height = h;
   const analyseCtx = analyseCanvas.getContext('2d');
   analyseCtx.drawImage(img, 0, 0, w, h);
-  
   const imageData = analyseCtx.getImageData(0, 0, w, h);
   const data = imageData.data;
   const brightPixels = [];
-  
   for (let i = 0; i < data.length; i += 4) {
     const r = data[i], g = data[i+1], b = data[i+2];
-    // Luminosité perceptuelle (formule ITU-R BT.709)
     const brightness = 0.2126 * r + 0.7152 * g + 0.0722 * b;
-    
     if (brightness < BRIGHTNESS_THRESHOLD) {
-      data[i + 3] = 0; // zone sombre → transparent dans le masque
+      data[i + 3] = 0;
     } else {
-      // 1 pixel sur 15 seulement pour ne pas surcharger
       if (Math.random() > 0.93) {
         const pixelIndex = i / 4;
-        brightPixels.push({
-          x: (pixelIndex % w) / w, // coordonnées normalisées 0-1
-          y: Math.floor(pixelIndex / w) / h
-        });
+        brightPixels.push({ x: (pixelIndex % w) / w, y: Math.floor(pixelIndex / w) / h });
       }
     }
   }
   analyseCtx.putImageData(imageData, 0, 0);
-  
   return { brightPixels, maskCanvas: analyseCanvas };
 }
 
-/**
- * Crée et anime la pulsation lumineuse + particules sur un canvas cible
- * @param {string} imgSrc         - image source
- * @param {HTMLCanvasElement} pulseCanvas  - canvas pour la pulsation (mix-blend: screen)
- * @param {HTMLCanvasElement} partCanvas   - canvas pour les particules
- * @param {number} particleCount  - nombre de particules
- * @returns {Function} stopFn - appeler pour arrêter l'animation
- */
 async function startLightEffect(imgSrc, pulseCanvas, partCanvas, particleCount = 60) {
   let running = true;
   let raf = null;
-  
-  // Dimensions des canvas (prises du parent)
+
   function syncSize() {
     const parent = pulseCanvas.parentElement;
     if (!parent) return;
-    const w = parent.offsetWidth;
-    const h = parent.offsetHeight;
+    const w = parent.offsetWidth, h = parent.offsetHeight;
     if (pulseCanvas.width !== w || pulseCanvas.height !== h) {
       pulseCanvas.width = w; pulseCanvas.height = h;
-      partCanvas.width = w; partCanvas.height = h;
+      partCanvas.width  = w; partCanvas.height  = h;
     }
   }
   syncSize();
-  
-  // Analyse de l'image à taille réduite (256x341 suffit)
+
   const analysisW = 256;
   const analysisH = Math.round(analysisW * (pulseCanvas.height / pulseCanvas.width || 1.33));
-  
-  let brightPixels = [];
-  let maskCanvas = null;
+  let brightPixels = [], maskCanvas = null;
   try {
     const result = await buildLightMask(imgSrc, analysisW, analysisH);
-    brightPixels = result.brightPixels;
-    maskCanvas = result.maskCanvas;
+    brightPixels = result.brightPixels; maskCanvas = result.maskCanvas;
   } catch(e) {
-    // Si l'analyse échoue (CORS etc.), on utilise des positions aléatoires
-    for (let i = 0; i < 40; i++) {
-      brightPixels.push({ x: Math.random(), y: Math.random() * 0.7 });
-    }
+    for (let i = 0; i < 40; i++) brightPixels.push({ x: Math.random(), y: Math.random() * 0.7 });
   }
-  
-  // ── Classe Particle ──
+
   class Particle {
     constructor() { this.reset(); }
     reset() {
       if (brightPixels.length > 0) {
         const pt = brightPixels[Math.floor(Math.random() * brightPixels.length)];
-        this.x = pt.x * partCanvas.width + (Math.random() - 0.5) * 20;
+        this.x = pt.x * partCanvas.width  + (Math.random() - 0.5) * 20;
         this.y = pt.y * partCanvas.height + (Math.random() - 0.5) * 20;
       } else {
         this.x = Math.random() * partCanvas.width;
         this.y = Math.random() * partCanvas.height;
       }
-      this.size = Math.random() * 2.5 + 0.8;
+      this.size   = Math.random() * 2.5 + 0.8;
       this.speedX = (Math.random() - 0.5) * 1.2;
-      this.speedY = -(Math.random() * 1.5 + 0.3); // monte vers le haut
-      this.life = 1.0;
-      this.decay = Math.random() * 0.018 + 0.006;
-      this.color = PARTICLE_COLORS[Math.floor(Math.random() * PARTICLE_COLORS.length)];
+      this.speedY = -(Math.random() * 1.5 + 0.3);
+      this.life   = 1.0;
+      this.decay  = Math.random() * 0.018 + 0.006;
+      this.color  = PARTICLE_COLORS[Math.floor(Math.random() * PARTICLE_COLORS.length)];
     }
     update() {
-      this.x += this.speedX;
-      this.y += this.speedY;
-      this.life -= this.decay;
+      this.x += this.speedX; this.y += this.speedY; this.life -= this.decay;
       if (this.life <= 0) this.reset();
     }
     draw(ctx) {
-      ctx.beginPath();
-      ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-      ctx.fillStyle = `rgba(${this.color},${this.life * 0.85})`;
-      ctx.fill();
+      ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(${this.color},${this.life * 0.85})`; ctx.fill();
     }
   }
-  
-  // Initialise les particules
+
   const particles = Array.from({ length: particleCount }, () => new Particle());
-  
-  // ── Boucle d'animation ──
+
   function animate() {
     if (!running) return;
     syncSize();
-    
-    const W = pulseCanvas.width;
-    const H = pulseCanvas.height;
-    
-    // 1. Pulsation lumineuse (canvas pulse)
+    const W = pulseCanvas.width, H = pulseCanvas.height;
     if (maskCanvas) {
       const pulseCtx = pulseCanvas.getContext('2d');
       pulseCtx.clearRect(0, 0, W, H);
-      
       const t = performance.now() / 1000;
-      const pulse = (Math.sin(t * Math.PI * 0.8) + 1) / 2; // oscille entre 0 et 1
-      
+      const pulse = (Math.sin(t * Math.PI * 0.8) + 1) / 2;
       pulseCtx.save();
       pulseCtx.globalAlpha = 0.15 + pulse * 0.35;
-      // Filtre glow subtil via shadow
       pulseCtx.shadowBlur = 12 + pulse * 18;
       pulseCtx.shadowColor = 'rgba(66,133,244,0.8)';
       pulseCtx.drawImage(maskCanvas, 0, 0, W, H);
       pulseCtx.restore();
     }
-    
-    // 2. Particules
     const pCtx = partCanvas.getContext('2d');
     pCtx.clearRect(0, 0, W, H);
-    for (const p of particles) {
-      p.update();
-      p.draw(pCtx);
-    }
-    
+    for (const p of particles) { p.update(); p.draw(pCtx); }
     raf = requestAnimationFrame(animate);
   }
-  
   animate();
-  
-  // Retourne la fonction stop
+
   return function stop() {
     running = false;
     if (raf) cancelAnimationFrame(raf);
-    const pc = pulseCanvas.getContext('2d');
-    if (pc) pc.clearRect(0, 0, pulseCanvas.width, pulseCanvas.height);
-    const ptc = partCanvas.getContext('2d');
-    if (ptc) ptc.clearRect(0, 0, partCanvas.width, partCanvas.height);
+    const pc = pulseCanvas.getContext('2d'); if (pc) pc.clearRect(0, 0, pulseCanvas.width, pulseCanvas.height);
+    const ptc = partCanvas.getContext('2d'); if (ptc) ptc.clearRect(0, 0, partCanvas.width, partCanvas.height);
   };
 }
 
-// Références aux fonctions stop des effets actifs
 let stopCardEffect = null;
 let stopRevealEffect = null;
 
 function stopAllParticleEffects() {
-  if (stopCardEffect) { stopCardEffect(); stopCardEffect = null; }
+  if (stopCardEffect)   { stopCardEffect(); stopCardEffect = null; }
   if (stopRevealEffect) { stopRevealEffect(); stopRevealEffect = null; }
-  stopParticles(); // particules de fond
+  stopParticles();
 }
 
 // ════════════════════════════════════════
-//  CINEMA REVEAL — avec effet lumineux activé
+//  CINEMA REVEAL
 // ════════════════════════════════════════
 async function cinemaReveal(imgSrc) {
-  // Stop tout effet réveal précédent
   if (stopRevealEffect) { stopRevealEffect(); stopRevealEffect = null; }
-  
-  const revealDiv = document.getElementById('gen-result-reveal');
-  const revealImg = document.getElementById('reveal-img');
+  const revealDiv        = document.getElementById('gen-result-reveal');
+  const revealImg        = document.getElementById('reveal-img');
   const revealPartCanvas = document.getElementById('reveal-particles-canvas');
   const revealMaskCanvas = document.getElementById('reveal-mask-canvas');
-  
+
   revealImg.src = imgSrc;
   revealImg.classList.remove('reveal-anim');
 
@@ -1530,41 +1532,27 @@ async function cinemaReveal(imgSrc) {
   await sleep(200); whiteFlash.classList.remove('flash-out');
 
   revealImg.classList.add('reveal-anim'); playSynthReveal();
-  
-  // Lance l'effet lumineux après que l'image soit chargée/dimensionnée
-  await sleep(400); // petit délai pour que le layout soit stable
-  
-  // Sync la taille des canvas réveal sur l'image
+  await sleep(400);
+
   function syncRevealCanvases() {
     const rect = revealImg.getBoundingClientRect();
     if (rect.width > 0 && rect.height > 0) {
-      revealPartCanvas.width = rect.width;
-      revealPartCanvas.height = rect.height;
-      revealMaskCanvas.width = rect.width;
-      revealMaskCanvas.height = rect.height;
-      // Position les canvas exactement sur l'image
-      revealPartCanvas.style.width = rect.width + 'px';
+      revealPartCanvas.width  = rect.width;  revealPartCanvas.height = rect.height;
+      revealMaskCanvas.width  = rect.width;  revealMaskCanvas.height = rect.height;
+      revealPartCanvas.style.width  = rect.width  + 'px';
       revealPartCanvas.style.height = rect.height + 'px';
-      revealMaskCanvas.style.width = rect.width + 'px';
+      revealMaskCanvas.style.width  = rect.width  + 'px';
       revealMaskCanvas.style.height = rect.height + 'px';
     }
   }
   syncRevealCanvases();
-  
   revealMaskCanvas.classList.add('active');
-  
-  // Démarre l'effet sur l'écran de révélation
-  stopRevealEffect = await startLightEffect(
-    imgSrc,
-    revealMaskCanvas,
-    revealPartCanvas,
-    80 // plus de particules pour le drama du reveal
-  );
+
+  stopRevealEffect = await startLightEffect(imgSrc, revealMaskCanvas, revealPartCanvas, 80);
 }
 
 function confirmReveal() {
   playSynthClick();
-  // Stop l'effet du reveal mais garde les données pour la carte
   if (stopRevealEffect) { stopRevealEffect(); stopRevealEffect = null; }
   document.getElementById('gen-result-reveal').classList.remove('show');
   document.getElementById('reveal-img').classList.remove('reveal-anim');
@@ -1577,65 +1565,149 @@ function confirmReveal() {
 // ════════════════════════════════════════
 async function addLogo(base64) {
   const [base, logo] = await Promise.all([loadImg(base64), loadImg(LOGO_URL)]);
-  const c = document.createElement('canvas'); c.width=base.width; c.height=base.height;
-  const ctx = c.getContext('2d'); ctx.drawImage(base,0,0);
-  const lw=base.width*0.25, lh=lw*(logo.height/logo.width), m=base.width*0.025;
-  ctx.globalAlpha=1; ctx.drawImage(logo, base.width-lw-m, base.height-lh-m, lw, lh);
+  const c = document.createElement('canvas'); c.width = base.width; c.height = base.height;
+  const ctx = c.getContext('2d'); ctx.drawImage(base, 0, 0);
+  const lw = base.width * 0.25, lh = lw * (logo.height / logo.width), m = base.width * 0.025;
+  ctx.globalAlpha = 1; ctx.drawImage(logo, base.width - lw - m, base.height - lh - m, lw, lh);
   return c.toDataURL('image/png');
 }
-function loadImg(src) { return new Promise((res,rej)=>{ const i=new Image(); i.crossOrigin='anonymous'; i.onload=()=>res(i); i.onerror=()=>rej(); i.src=src; }); }
+function loadImg(src) {
+  return new Promise((res, rej) => {
+    const i = new Image(); i.crossOrigin = 'anonymous';
+    i.onload = () => res(i); i.onerror = () => rej();
+    i.src = src;
+  });
+}
 
 // ════════════════════════════════════════
 //  RÉSULTAT
 // ════════════════════════════════════════
 function showResult() {
   const arch = ARCHETYPES[selectedArch];
-  document.getElementById('result-img').src = resultImage;
-  document.getElementById('res-name-em').textContent = userName;
+  document.getElementById('result-img').src   = resultImage;
+  document.getElementById('res-name-em').textContent   = userName;
   document.getElementById('res-arch-badge').textContent = arch.emoji + ' ' + arch.label;
-
-  // Contenu de la trading card
-  document.getElementById('card-name').textContent = userName;
+  document.getElementById('card-name').textContent     = userName;
   document.getElementById('card-arch-sub').textContent = arch.label;
   document.getElementById('card-badge-arch').textContent = arch.label;
 
   hideStatus(); showScreen('screen-result');
 
-  // Lance tout en parallèle après le rendu
   requestAnimationFrame(async () => {
-    initParticles();    // particules de fond (zone gauche)
-    initCardTilt();     // effet 3D de la carte
-    loadLeaderboard();  // stats live
+    initParticles();
+    initCardTilt();
+    loadLeaderboard();
+    loadGallery();   // ← charge le carrousel Drive
 
-    // Lance l'effet lumineux sur la carte
     const pulseCanvas = document.getElementById('card-pulse-canvas');
-    const partCanvas = document.getElementById('card-particles-overlay');
-
-    // Attend que la carte soit rendue pour lire ses dimensions
+    const partCanvas  = document.getElementById('card-particles-overlay');
     await sleep(100);
     const card = document.getElementById('hero-card');
-    pulseCanvas.width  = card.offsetWidth;
-    pulseCanvas.height = card.offsetHeight;
-    partCanvas.width   = card.offsetWidth;
-    partCanvas.height  = card.offsetHeight;
-
+    pulseCanvas.width  = card.offsetWidth;  pulseCanvas.height = card.offsetHeight;
+    partCanvas.width   = card.offsetWidth;  partCanvas.height  = card.offsetHeight;
     if (stopCardEffect) stopCardEffect();
-    stopCardEffect = await startLightEffect(
-      resultImage,
-      pulseCanvas,
-      partCanvas,
-      50 // 50 particules sur la carte
-    );
+    stopCardEffect = await startLightEffect(resultImage, pulseCanvas, partCanvas, 50);
   });
 }
 
 // ════════════════════════════════════════
-//  PARTICULES CANVAS (fond zone gauche — inchangé)
+//  CARROUSEL GALERIE DRIVE
+// ════════════════════════════════════════
+
+/**
+ * Charge les images du dossier Drive via Apps Script (action getGallery)
+ * et construit le carrousel HTML.
+ */
+async function loadGallery() {
+  const container = document.getElementById('gallery-inner');
+  container.innerHTML = '<div class="gallery-loading">Chargement des avatars…</div>';
+
+  try {
+    const res = await fetch(API_URL, {
+      method: 'POST',
+      headers: {'Content-Type': 'text/plain;charset=utf-8'},
+      body: JSON.stringify({ action: 'getGallery', secret: SECRET })
+      // Pas de filtre archétype : on affiche toute la galerie du stand
+    });
+    const data = await res.json();
+
+    if (!data.success || !data.images || data.images.length === 0) {
+      container.innerHTML = '<div class="gallery-empty">Aucun avatar encore généré aujourd\'hui.</div>';
+      return;
+    }
+
+    buildCarousel(container, data.images);
+
+  } catch(e) {
+    container.innerHTML = '<div class="gallery-empty">Galerie indisponible.</div>';
+  }
+}
+
+/**
+ * Construit le HTML du carrousel à partir du tableau d'images.
+ * @param {HTMLElement} container
+ * @param {Array<{fileId, thumbnailUrl, name, createdAt}>} images
+ */
+function buildCarousel(container, images) {
+  const carouselId = 'gallery-carousel-' + Date.now();
+
+  const items = images.map((img, idx) => {
+    const isMine = currentFileId && img.fileId === currentFileId;
+    return `
+      <div class="gallery-item${isMine ? ' is-mine' : ''}"
+           onclick="openLightbox('${img.thumbnailUrl.replace(/&sz=w600/, '&sz=w1200')}')">
+        <img src="${img.thumbnailUrl}"
+             alt="Avatar ${idx + 1}"
+             loading="lazy"
+             onerror="this.parentElement.style.display='none'">
+        <div class="gallery-lightbox-hint">🔍</div>
+      </div>`;
+  }).join('');
+
+  container.innerHTML = `
+    <div class="gallery-carousel" id="${carouselId}">${items}</div>
+    <div class="gallery-nav">
+      <button class="gallery-nav-btn" onclick="scrollCarousel('${carouselId}', -1)" title="Précédent">◀</button>
+      <button class="gallery-nav-btn" onclick="scrollCarousel('${carouselId}', 1)"  title="Suivant">▶</button>
+      <span style="font-family:'Share Tech Mono',monospace;font-size:11px;color:rgba(38,47,99,0.5);margin-left:6px;align-self:center;">
+        ${images.length} avatar${images.length > 1 ? 's' : ''}
+      </span>
+    </div>`;
+}
+
+/**
+ * Fait défiler le carrousel de N items.
+ * @param {string} carouselId
+ * @param {number} direction - -1 (gauche) ou +1 (droite)
+ */
+function scrollCarousel(carouselId, direction) {
+  const el = document.getElementById(carouselId);
+  if (!el) return;
+  const itemWidth = 72 + 10; // width + gap
+  el.scrollBy({ left: direction * itemWidth * 3, behavior: 'smooth' });
+}
+
+// ── Lightbox ──
+function openLightbox(url) {
+  document.getElementById('gallery-lightbox-img').src = url;
+  document.getElementById('gallery-lightbox').classList.add('open');
+}
+function closeLightbox() {
+  document.getElementById('gallery-lightbox').classList.remove('open');
+  document.getElementById('gallery-lightbox-img').src = '';
+}
+// Fermeture clavier
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') closeLightbox();
+});
+
+// ════════════════════════════════════════
+//  PARTICULES CANVAS (fond zone gauche)
 // ════════════════════════════════════════
 let particlesRAF = null;
 
 function initParticles() {
-  const canvas = document.getElementById('particles-canvas');
+  const canvas    = document.getElementById('particles-canvas');
   const container = canvas.parentElement;
   canvas.width  = container.offsetWidth;
   canvas.height = container.offsetHeight;
@@ -1655,17 +1727,11 @@ function initParticles() {
   function draw() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     for (const p of particles) {
-      ctx.beginPath();
-      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-      ctx.fillStyle = `rgba(${p.color},${p.opacity})`;
-      ctx.fill();
-
-      p.x += p.vx;
-      p.y += p.vy;
-
+      ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(${p.color},${p.opacity})`; ctx.fill();
+      p.x += p.vx; p.y += p.vy;
       if (p.x < 0 || p.x > canvas.width)  p.vx *= -1;
       if (p.y < 0 || p.y > canvas.height) p.vy *= -1;
-
       p.opacity += (Math.random() - 0.5) * 0.012;
       p.opacity = Math.max(0.05, Math.min(0.55, p.opacity));
     }
@@ -1681,7 +1747,7 @@ function stopParticles() {
 }
 
 // ════════════════════════════════════════
-//  TILT 3D CARTE (inchangé)
+//  TILT 3D CARTE
 // ════════════════════════════════════════
 function initCardTilt() {
   const wrapper = document.getElementById('card-tilt-wrapper');
@@ -1689,7 +1755,6 @@ function initCardTilt() {
   const shine   = document.getElementById('card-shine');
 
   let targetRX = 0, targetRY = 0, currentRX = 0, currentRY = 0;
-
   function lerp(a, b, t) { return a + (b - a) * t; }
 
   function animateTilt() {
@@ -1704,31 +1769,24 @@ function initCardTilt() {
     const rect = wrapper.getBoundingClientRect();
     const cx = rect.left + rect.width  / 2;
     const cy = rect.top  + rect.height / 2;
-    const dx = (e.clientX - cx) / (rect.width  / 2);
-    const dy = (e.clientY - cy) / (rect.height / 2);
-
-    targetRY =  dx * 8;
-    targetRX = -dy * 8;
-
+    targetRY =  ((e.clientX - cx) / (rect.width  / 2)) * 8;
+    targetRX = -((e.clientY - cy) / (rect.height / 2)) * 8;
     const mx = ((e.clientX - rect.left) / rect.width  * 100).toFixed(1);
     const my = ((e.clientY - rect.top)  / rect.height * 100).toFixed(1);
     shine.style.setProperty('--mx', mx + '%');
     shine.style.setProperty('--my', my + '%');
   });
-
   wrapper.addEventListener('mouseleave', () => {
-    targetRX = 0;
-    targetRY = 0;
+    targetRX = 0; targetRY = 0;
     card.style.boxShadow = '0 20px 60px rgba(38,47,99,0.35), 0 4px 16px rgba(38,47,99,0.15)';
   });
-
   wrapper.addEventListener('mouseenter', () => {
     card.style.boxShadow = '0 28px 70px rgba(38,47,99,0.45), 0 8px 24px rgba(66,133,244,0.15)';
   });
 }
 
 // ════════════════════════════════════════
-//  LEADERBOARD (inchangé)
+//  LEADERBOARD
 // ════════════════════════════════════════
 const ARCH_LABELS = {
   'security-sentinel': '🛡️ Security Sentinel',
@@ -1740,11 +1798,10 @@ const ARCH_LABELS = {
 async function loadLeaderboard() {
   const lbContent = document.getElementById('lb-content');
   const lbTotal   = document.getElementById('lb-total');
-
   try {
     const res = await fetch(API_URL, {
       method: 'POST',
-      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      headers: {'Content-Type': 'text/plain;charset=utf-8'},
       body: JSON.stringify({ action: 'getStats', secret: SECRET })
     });
     const data = await res.json();
@@ -1758,14 +1815,14 @@ async function loadLeaderboard() {
       .map(([k, v]) => ({ key: k, count: v }))
       .sort((a, b) => b.count - a.count);
 
-    const maxCount = sorted[0]?.count || 1;
-    const rankLabels = ['①', '②', '③', '④'];
+    const maxCount    = sorted[0]?.count || 1;
+    const rankLabels  = ['①', '②', '③', '④'];
     const rankClasses = ['gold', 'silver', 'bronze', ''];
 
     let html = '';
     sorted.forEach((item, i) => {
       const isActive = item.key === selectedArch;
-      const pct = maxCount > 0 ? Math.round(item.count / maxCount * 100) : 0;
+      const pct      = maxCount > 0 ? Math.round(item.count / maxCount * 100) : 0;
       html += `
         <div class="lb-row">
           <span class="lb-rank ${rankClasses[i]}">${rankLabels[i]}</span>
@@ -1800,31 +1857,32 @@ async function sendEmail() {
   setStatus('info', '> Envoi en cours…');
   try {
     const res = await fetch(API_URL, {
-      method:'POST', headers:{'Content-Type':'text/plain;charset=utf-8'},
-      body: JSON.stringify({ action:'sendEmail', secret:SECRET, email:userEmail, nom:userName, image:resultImage, archetype:selectedArch })
+      method: 'POST', headers: {'Content-Type': 'text/plain;charset=utf-8'},
+      body: JSON.stringify({ action: 'sendEmail', secret: SECRET, email: userEmail, nom: userName, image: resultImage, archetype: selectedArch })
     });
     const d = await res.json();
-    if (d.success) setStatus('success', '> Email envoyé à '+userEmail+' ✓');
-    else setStatus('error', '> ERREUR : '+d.error);
-  } catch(e) { setStatus('error', '> ERREUR : '+e.message); }
+    if (d.success) setStatus('success', '> Email envoyé à ' + userEmail + ' ✓');
+    else setStatus('error', '> ERREUR : ' + d.error);
+  } catch(e) { setStatus('error', '> ERREUR : ' + e.message); }
 }
 function setStatus(type, msg) {
   const el = document.getElementById('result-status');
-  el.className = 'result-status '+type; el.textContent = msg;
+  el.className = 'result-status ' + type; el.textContent = msg;
 }
 function hideStatus() { document.getElementById('result-status').className = 'result-status'; }
 
 function resetAll(silent) {
-  selectedArch=null; userName=''; userEmail=''; capturedB64=null; resultImage=null;
-  if (camStream) { camStream.getTracks().forEach(t=>t.stop()); camStream=null; }
-  if (countdownInt) { clearInterval(countdownInt); countdownInt=null; }
-  if (genProgressInterval) { clearInterval(genProgressInterval); genProgressInterval=null; }
-  if (loadingMsgInterval) { clearInterval(loadingMsgInterval); loadingMsgInterval=null; }
+  selectedArch = null; userName = ''; userEmail = ''; capturedB64 = null; resultImage = null; currentFileId = null;
+  if (camStream)           { camStream.getTracks().forEach(t=>t.stop()); camStream = null; }
+  if (countdownInt)        { clearInterval(countdownInt);        countdownInt = null; }
+  if (genProgressInterval) { clearInterval(genProgressInterval); genProgressInterval = null; }
+  if (loadingMsgInterval)  { clearInterval(loadingMsgInterval);  loadingMsgInterval = null; }
   document.getElementById('countdown-overlay').classList.remove('show');
   document.getElementById('gen-overlay').classList.remove('show');
   document.getElementById('gen-result-reveal').classList.remove('show');
   document.getElementById('gen-white-flash').className = '';
   document.getElementById('form-overlay').classList.remove('open');
+  document.getElementById('gallery-lightbox').classList.remove('open');
   stopAllParticleEffects();
   if (!silent) showScreen('screen-choose');
 }
