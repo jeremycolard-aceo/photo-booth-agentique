@@ -98,7 +98,7 @@ body::before {
   background: var(--blanc);
 }
 .logo-aceo {
-  height: 95px; /* ACEO logo beaucoup plus grand */
+  height: 95px;
   opacity: 1;
 }
 .header-tag {
@@ -440,7 +440,6 @@ canvas { display: none; }
 }
 #gen-overlay.show { display: flex; }
 
-/* Animation Fusée ACEO */
 .gen-rocket {
   width: 100px;
   height: auto;
@@ -512,35 +511,143 @@ canvas { display: none; }
 /* ══════════════════════════════════
    ÉCRAN C — RÉSULTAT
 ══════════════════════════════════ */
-#screen-result { flex-direction: row; }
+#screen-result { flex-direction: row; overflow: hidden; }
 
+/* ── ZONE GAUCHE : canvas particules + carte ── */
 .result-left {
-  flex: 1.1; display: flex; align-items: center; justify-content: center;
+  flex: 1.1;
+  position: relative;
+  display: flex; align-items: center; justify-content: center;
   padding: 28px 20px 28px 44px;
-}
-.result-img-wrap {
-  position: relative; width: 100%; max-width: 480px; aspect-ratio: 3/4;
-  border-radius: 8px; overflow: hidden;
-  box-shadow: 0 15px 40px rgba(38, 47, 99, 0.2);
-  animation: result-reveal 0.8s cubic-bezier(0.22,1,0.36,1);
-}
-@keyframes result-reveal { from{opacity:0;transform:scale(0.91)} to{opacity:1;transform:scale(1)} }
-.result-img-wrap img { width:100%; height:100%; object-fit:cover; display:block; }
-.result-logo {
-  position: absolute; bottom: 20px; right: 20px;
-  height: 45px; opacity: 1; /* Logo ACEO visible sur la carte */
+  overflow: hidden;
 }
 
+/* Canvas particules en fond de la zone gauche */
+#particles-canvas {
+  position: absolute; inset: 0; z-index: 0;
+  pointer-events: none;
+}
+
+/* Wrapper de la carte avec perspective pour le tilt */
+.card-tilt-wrapper {
+  position: relative; z-index: 1;
+  width: 100%; max-width: 420px;
+  perspective: 900px;
+  cursor: default;
+}
+
+/* ── TRADING CARD STYLISÉE ── */
+.hero-card {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 3/4;
+  border-radius: 16px;
+  overflow: hidden;
+  transform-style: preserve-3d;
+  transition: transform 0.12s ease-out, box-shadow 0.12s ease-out;
+  box-shadow:
+    0 20px 60px rgba(38, 47, 99, 0.35),
+    0 4px 16px rgba(38, 47, 99, 0.15);
+  will-change: transform;
+}
+
+/* Photo générée prend toute la carte */
+.hero-card .card-photo {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  object-fit: cover; display: block;
+}
+
+/* Reflet holographique qui suit la souris */
+.hero-card .card-shine {
+  position: absolute; inset: 0; z-index: 3;
+  background: radial-gradient(
+    circle at var(--mx, 50%) var(--my, 50%),
+    rgba(255,255,255,0.18) 0%,
+    rgba(255,255,255,0.06) 30%,
+    transparent 65%
+  );
+  border-radius: 16px;
+  pointer-events: none;
+  transition: background 0.08s;
+  mix-blend-mode: screen;
+}
+
+/* Overlay dégradé bas de carte */
+.hero-card .card-overlay {
+  position: absolute; inset: 0; z-index: 2;
+  background: linear-gradient(
+    to bottom,
+    transparent 45%,
+    rgba(38, 47, 99, 0.55) 70%,
+    rgba(38, 47, 99, 0.92) 100%
+  );
+}
+
+/* Contenu texte de la carte */
+.hero-card .card-content {
+  position: absolute; bottom: 0; left: 0; right: 0; z-index: 4;
+  padding: 20px 22px 22px;
+}
+
+/* Badge archétype */
+.hero-card .card-badge {
+  display: inline-block;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase;
+  padding: 5px 12px;
+  background: var(--bleu-google);
+  color: var(--blanc);
+  border-radius: 3px;
+  margin-bottom: 8px;
+}
+
+/* Nom sur la carte */
+.hero-card .card-name {
+  font-family: 'Black Ops One', cursive;
+  font-size: clamp(22px, 2.8vw, 36px);
+  color: var(--blanc);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  line-height: 1;
+  text-shadow: 0 2px 8px rgba(0,0,0,0.6);
+}
+
+/* Sous-titre archétype */
+.hero-card .card-arch {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 13px; letter-spacing: 0.1em;
+  color: rgba(255,255,255,0.7);
+  text-transform: uppercase;
+  margin-top: 4px;
+}
+
+/* Logo ACEO en bas à droite de la carte */
+.hero-card .card-logo {
+  position: absolute; bottom: 18px; right: 18px; z-index: 5;
+  height: 36px; opacity: 0.95;
+}
+
+/* Bordure brillante de la carte */
+.hero-card::before {
+  content: '';
+  position: absolute; inset: 0; z-index: 6;
+  border-radius: 16px;
+  border: 1.5px solid rgba(255,255,255,0.25);
+  pointer-events: none;
+}
+
+/* ── ZONE DROITE — actions + leaderboard ── */
 .result-right {
   flex: 1; display: flex; flex-direction: column; justify-content: center;
-  padding: 32px 44px 32px 28px; gap: 18px;
+  padding: 32px 44px 32px 28px; gap: 16px;
 }
 .result-eyebrow {
   font-family: 'Share Tech Mono', monospace; font-size: 14px;
   font-weight: bold; text-transform: uppercase; color: var(--bleu-canard);
 }
 .result-title {
-  font-family: 'Black Ops One', cursive; font-size: clamp(36px, 4.5vw, 62px);
+  font-family: 'Black Ops One', cursive; font-size: clamp(32px, 4vw, 56px);
   color: var(--bleu-nuit); text-transform: uppercase; line-height: 1;
 }
 .result-title em { font-style: normal; color: var(--bleu-google); display: block; }
@@ -552,27 +659,111 @@ canvas { display: none; }
   color: var(--bleu-nuit); font-weight: bold; text-transform: uppercase; width: fit-content;
 }
 
-.result-actions { display: flex; flex-direction: column; gap: 12px; margin-top: 10px; }
+.result-actions { display: flex; flex-direction: column; gap: 10px; }
 .btn-action {
-  padding: 18px 24px; border-radius: 4px; font-family: 'Black Ops One', cursive;
-  font-size: 16px; text-transform: uppercase; cursor: pointer; border: none;
+  padding: 16px 24px; border-radius: 4px; font-family: 'Black Ops One', cursive;
+  font-size: 15px; text-transform: uppercase; cursor: pointer; border: none;
   transition: all 0.2s; text-align: left;
 }
 .btn-action-primary { background: var(--bleu-google); color: var(--blanc); }
 .btn-action-primary:hover { background: #3371db; transform: translateX(4px); }
 .btn-action-ghost {
   background: var(--blanc-casse); color: var(--bleu-canard);
-  font-family: 'Rajdhani', sans-serif; font-size: 16px; font-weight: 700;
+  font-family: 'Rajdhani', sans-serif; font-size: 15px; font-weight: 700;
 }
 .btn-action-ghost:hover { background: #e2e4e9; color: var(--bleu-nuit); transform: translateX(4px); }
 
 .result-status {
-  font-family: 'Share Tech Mono', monospace; font-size: 14px; padding: 12px 16px;
+  font-family: 'Share Tech Mono', monospace; font-size: 13px; padding: 10px 14px;
   border-radius: 4px; display: none; font-weight: bold;
 }
 .result-status.info    { display:block; background:#e8f0fe; color:var(--bleu-google); border-left:4px solid var(--bleu-google); }
 .result-status.success { display:block; background:#e6f4ea; color:#137333; border-left:4px solid #137333; }
 .result-status.error   { display:block; background:#fce8e6; color:#c5221f; border-left:4px solid #c5221f; }
+
+/* ══════════════════════════════════
+   LEADERBOARD
+══════════════════════════════════ */
+.leaderboard {
+  background: var(--blanc-casse);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 16px 20px;
+  flex-shrink: 0;
+}
+.leaderboard-title {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 11px; font-weight: bold;
+  letter-spacing: 0.15em; text-transform: uppercase;
+  color: var(--bleu-canard);
+  margin-bottom: 12px;
+  display: flex; align-items: center; gap: 8px;
+}
+.leaderboard-title::after {
+  content: '';
+  flex: 1; height: 1px;
+  background: var(--border);
+}
+
+.lb-row {
+  display: flex; align-items: center; gap: 10px;
+  margin-bottom: 8px;
+}
+.lb-row:last-child { margin-bottom: 0; }
+
+.lb-rank {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 11px; color: rgba(38,47,99,0.4);
+  width: 18px; text-align: center; flex-shrink: 0;
+}
+.lb-rank.gold   { color: #e8a020; font-weight: bold; }
+.lb-rank.silver { color: #888; font-weight: bold; }
+.lb-rank.bronze { color: #b06020; font-weight: bold; }
+
+.lb-label {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 12px; text-transform: uppercase;
+  letter-spacing: 0.06em; color: var(--bleu-nuit);
+  flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.lb-label.active-arch {
+  color: var(--bleu-google);
+}
+
+.lb-bar-wrap {
+  flex: 2; height: 6px; background: rgba(38,47,99,0.08);
+  border-radius: 3px; overflow: hidden;
+}
+.lb-bar {
+  height: 100%; border-radius: 3px;
+  background: linear-gradient(90deg, var(--bleu-google), #74a8ff);
+  transition: width 1.2s cubic-bezier(0.22,1,0.36,1);
+  width: 0%;
+}
+.lb-bar.active-bar {
+  background: linear-gradient(90deg, var(--orange-ambre), #fbd07a);
+}
+
+.lb-count {
+  font-family: 'Black Ops One', cursive;
+  font-size: 15px; color: var(--bleu-nuit);
+  min-width: 28px; text-align: right; flex-shrink: 0;
+}
+.lb-count.active-count { color: var(--bleu-google); }
+
+.lb-total {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 11px; color: rgba(38,47,99,0.45);
+  text-align: right; margin-top: 10px;
+  border-top: 1px solid var(--border); padding-top: 8px;
+}
+
+.lb-loading {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 12px; color: var(--bleu-canard);
+  text-align: center; padding: 8px 0;
+  animation: sub-blink 1.6s ease-in-out infinite;
+}
 </style>
 </head>
 <body>
@@ -664,17 +855,33 @@ canvas { display: none; }
     </div>
   </div>
 
+  <!-- ── ÉCRAN RÉSULTAT ── -->
   <div class="screen" id="screen-result">
+
+    <!-- Zone gauche : particules + trading card tiltable -->
     <div class="result-left">
-      <div class="result-img-wrap" id="result-img-wrap">
-        <img id="result-img" src="" alt="Votre avatar">
-        <img class="result-logo" src="https://raw.githubusercontent.com/jeremycolard-aceo/photo-booth-agentique/main/logo-aceo.png" alt="ACEO" onerror="this.style.display='none'">
+      <canvas id="particles-canvas"></canvas>
+      <div class="card-tilt-wrapper" id="card-tilt-wrapper">
+        <div class="hero-card" id="hero-card">
+          <img class="card-photo" id="result-img" src="" alt="Votre avatar">
+          <div class="card-overlay"></div>
+          <div class="card-shine" id="card-shine"></div>
+          <div class="card-content">
+            <div class="card-badge" id="card-badge-arch">—</div>
+            <div class="card-name" id="card-name">Prénom</div>
+            <div class="card-arch" id="card-arch-sub">Archétype</div>
+          </div>
+          <img class="card-logo" src="https://raw.githubusercontent.com/jeremycolard-aceo/photo-booth-agentique/main/logo-aceo.png" alt="ACEO" onerror="this.style.display='none'">
+        </div>
       </div>
     </div>
+
+    <!-- Zone droite : infos + actions + leaderboard -->
     <div class="result-right">
       <div class="result-eyebrow">◆ Votre Google Cloud Hero ◆</div>
       <div class="result-title"><em id="res-name-em">Prénom</em>est prêt.</div>
       <div class="result-arch-badge" id="res-arch-badge">— Archétype —</div>
+
       <div class="result-actions">
         <button class="btn-action btn-action-primary" onclick="sendEmail()">
           Recevoir mon avatar par email →
@@ -687,7 +894,15 @@ canvas { display: none; }
         </button>
       </div>
       <div class="result-status" id="result-status"></div>
+
+      <!-- Leaderboard archétypes -->
+      <div class="leaderboard" id="leaderboard">
+        <div class="leaderboard-title">◆ Live au salon</div>
+        <div id="lb-content"><div class="lb-loading">Chargement des stats…</div></div>
+        <div class="lb-total" id="lb-total" style="display:none;"></div>
+      </div>
     </div>
+
   </div>
 </div>
 
@@ -696,7 +911,6 @@ canvas { display: none; }
     <button class="form-close" onclick="closeForm()">✕</button>
     <div class="form-card-title">Identify</div>
     <div class="form-card-sub">Archétype sélectionné : <strong id="form-arch-name">—</strong><br>Entrez vos données pour activer le protocole.</div>
-    
     <div class="field">
       <label>Prénom</label>
       <input type="text" id="f-nom" placeholder="Votre prénom" autocomplete="off" oninput="checkForm()">
@@ -705,12 +919,10 @@ canvas { display: none; }
       <label>Email</label>
       <input type="email" id="f-email" placeholder="vous@example.com" autocomplete="off" oninput="checkForm()">
     </div>
-    
     <div class="consent-row" onclick="toggleConsent()">
       <input type="checkbox" id="f-consent">
       <span>J'accepte que ma photo soit utilisée pour générer un avatar IA. L'image brute est supprimée immédiatement après génération. L'avatar est conservé 30 jours. Aucune donnée n'est utilisée pour entraîner un modèle.</span>
     </div>
-    
     <button class="btn-validate" id="btn-validate" disabled onclick="submitForm()">
       Activer le protocole →
     </button>
@@ -797,7 +1009,7 @@ function playSynthReveal() {
   } catch(e) {}
 }
 
-let ambientLoaded = false; let ambientPlaying = false; let ambientGain = null;
+let ambientPlaying = false;
 function startAmbient() {
   const el = document.getElementById('snd-ambient');
   el.src = './musique.mp3'; el.volume = 0;
@@ -813,20 +1025,20 @@ function startAmbient() {
 
 function startSynthAmbient() {
   try {
-    const ctx = getAudio(); ambientGain = ctx.createGain(); ambientGain.gain.value = 0;
-    ambientGain.connect(ctx.destination);
+    const ctx = getAudio(); const aGain = ctx.createGain(); aGain.gain.value = 0;
+    aGain.connect(ctx.destination);
     function makeLayer(freq, type, vol, vibRate) {
       const osc = ctx.createOscillator(); const lfo = ctx.createOscillator();
       const lfoGain = ctx.createGain(); lfo.frequency.value = vibRate;
       lfoGain.gain.value = freq * 0.003; lfo.connect(lfoGain); lfoGain.connect(osc.frequency);
       const g = ctx.createGain(); g.gain.value = vol;
       osc.type = type; osc.frequency.value = freq;
-      osc.connect(g); g.connect(ambientGain); osc.start(); lfo.start();
+      osc.connect(g); g.connect(aGain); osc.start(); lfo.start();
     }
     makeLayer(110, 'sine', 0.1, 0.13); makeLayer(165, 'triangle', 0.05, 0.23);
     let v = 0;
     const fad = setInterval(() => {
-      v = Math.min(v + 0.002, 0.08); ambientGain.gain.value = v;
+      v = Math.min(v + 0.002, 0.08); aGain.gain.value = v;
       if (v >= 0.08) clearInterval(fad);
     }, 80);
     ambientPlaying = true;
@@ -879,12 +1091,13 @@ function exitVideo() {
 }
 function goToSleep() {
   clearInterval(idleInterval); unbindIdleEvents(); resetAll(true);
+  stopParticles();
   document.getElementById('app').classList.remove('visible');
   document.getElementById('screen-video').style.display = 'flex';
   document.getElementById('idle-video').play().catch(()=>{});
 }
 function goHome() {
-  playSynthClick(); resetAll(true);
+  playSynthClick(); resetAll(true); stopParticles();
   document.getElementById('app').classList.remove('visible');
   document.getElementById('screen-video').style.display = 'flex';
   document.getElementById('idle-video').play().catch(()=>{});
@@ -1076,8 +1289,196 @@ function showResult() {
   const arch = ARCHETYPES[selectedArch];
   document.getElementById('result-img').src = resultImage;
   document.getElementById('res-name-em').textContent = userName;
-  document.getElementById('res-arch-badge').textContent = arch.emoji+' '+arch.label;
+  document.getElementById('res-arch-badge').textContent = arch.emoji + ' ' + arch.label;
+
+  // Contenu de la trading card
+  document.getElementById('card-name').textContent = userName;
+  document.getElementById('card-arch-sub').textContent = arch.label;
+  document.getElementById('card-badge-arch').textContent = arch.label;
+
   hideStatus(); showScreen('screen-result');
+
+  // Lance particules + tilt + stats en parallèle
+  requestAnimationFrame(() => {
+    initParticles();
+    initCardTilt();
+    loadLeaderboard();
+  });
+}
+
+// ════════════════════════════════════════
+//  PARTICULES CANVAS
+// ════════════════════════════════════════
+let particlesRAF = null;
+
+function initParticles() {
+  const canvas = document.getElementById('particles-canvas');
+  const container = canvas.parentElement;
+  canvas.width  = container.offsetWidth;
+  canvas.height = container.offsetHeight;
+  const ctx = canvas.getContext('2d');
+
+  const N = 38;
+  const particles = Array.from({length: N}, () => ({
+    x: Math.random() * canvas.width,
+    y: Math.random() * canvas.height,
+    r: Math.random() * 2.2 + 0.6,
+    vx: (Math.random() - 0.5) * 0.35,
+    vy: (Math.random() - 0.55) * 0.45,
+    opacity: Math.random() * 0.4 + 0.1,
+    // couleur : bleu google ou orange ambre
+    color: Math.random() > 0.6 ? '246,161,25' : '66,133,244'
+  }));
+
+  function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    for (const p of particles) {
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(${p.color},${p.opacity})`;
+      ctx.fill();
+
+      p.x += p.vx;
+      p.y += p.vy;
+
+      // rebond doux sur les bords
+      if (p.x < 0 || p.x > canvas.width)  p.vx *= -1;
+      if (p.y < 0 || p.y > canvas.height) p.vy *= -1;
+
+      // scintillement léger
+      p.opacity += (Math.random() - 0.5) * 0.012;
+      p.opacity = Math.max(0.05, Math.min(0.55, p.opacity));
+    }
+    particlesRAF = requestAnimationFrame(draw);
+  }
+  draw();
+}
+
+function stopParticles() {
+  if (particlesRAF) { cancelAnimationFrame(particlesRAF); particlesRAF = null; }
+  const canvas = document.getElementById('particles-canvas');
+  if (canvas) { const ctx = canvas.getContext('2d'); ctx.clearRect(0, 0, canvas.width, canvas.height); }
+}
+
+// ════════════════════════════════════════
+//  TILT 3D CARTE
+// ════════════════════════════════════════
+function initCardTilt() {
+  const wrapper = document.getElementById('card-tilt-wrapper');
+  const card    = document.getElementById('hero-card');
+  const shine   = document.getElementById('card-shine');
+
+  let targetRX = 0, targetRY = 0, currentRX = 0, currentRY = 0;
+  let tiltRAF = null;
+
+  function lerp(a, b, t) { return a + (b - a) * t; }
+
+  function animateTilt() {
+    currentRX = lerp(currentRX, targetRX, 0.1);
+    currentRY = lerp(currentRY, targetRY, 0.1);
+    card.style.transform = `rotateX(${currentRX}deg) rotateY(${currentRY}deg) scale(1.02)`;
+    tiltRAF = requestAnimationFrame(animateTilt);
+  }
+  animateTilt();
+
+  wrapper.addEventListener('mousemove', (e) => {
+    const rect = wrapper.getBoundingClientRect();
+    const cx = rect.left + rect.width  / 2;
+    const cy = rect.top  + rect.height / 2;
+    const dx = (e.clientX - cx) / (rect.width  / 2);  // -1 à 1
+    const dy = (e.clientY - cy) / (rect.height / 2);  // -1 à 1
+
+    // tilt max ±8°
+    targetRY =  dx * 8;
+    targetRX = -dy * 8;
+
+    // reflet holographique suit le curseur
+    const mx = ((e.clientX - rect.left) / rect.width  * 100).toFixed(1);
+    const my = ((e.clientY - rect.top)  / rect.height * 100).toFixed(1);
+    shine.style.setProperty('--mx', mx + '%');
+    shine.style.setProperty('--my', my + '%');
+  });
+
+  wrapper.addEventListener('mouseleave', () => {
+    targetRX = 0;
+    targetRY = 0;
+    card.style.boxShadow = '0 20px 60px rgba(38,47,99,0.35), 0 4px 16px rgba(38,47,99,0.15)';
+  });
+
+  wrapper.addEventListener('mouseenter', () => {
+    card.style.boxShadow = '0 28px 70px rgba(38,47,99,0.45), 0 8px 24px rgba(66,133,244,0.15)';
+  });
+
+  // Nettoyage si on quitte l'écran
+  wrapper._tiltRAF = tiltRAF;
+}
+
+// ════════════════════════════════════════
+//  LEADERBOARD
+// ════════════════════════════════════════
+const ARCH_LABELS = {
+  'security-sentinel': '🛡️ Security Sentinel',
+  'ai-sorcerer':       '🧙 AI Sorcerer',
+  'cloud-architect':   '🏗️ Cloud Architect',
+  'data-wrangler':     '🗄️ Data Wrangler'
+};
+
+async function loadLeaderboard() {
+  const lbContent = document.getElementById('lb-content');
+  const lbTotal   = document.getElementById('lb-total');
+
+  try {
+    const res = await fetch(API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify({ action: 'getStats', secret: SECRET })
+    });
+    const data = await res.json();
+
+    if (!data.success) {
+      lbContent.innerHTML = '<div class="lb-loading">Stats indisponibles</div>';
+      return;
+    }
+
+    // Tri décroissant
+    const sorted = Object.entries(data.counts)
+      .map(([k, v]) => ({ key: k, count: v }))
+      .sort((a, b) => b.count - a.count);
+
+    const maxCount = sorted[0]?.count || 1;
+    const rankLabels = ['①', '②', '③', '④'];
+    const rankClasses = ['gold', 'silver', 'bronze', ''];
+
+    let html = '';
+    sorted.forEach((item, i) => {
+      const isActive = item.key === selectedArch;
+      const pct = maxCount > 0 ? Math.round(item.count / maxCount * 100) : 0;
+      html += `
+        <div class="lb-row">
+          <span class="lb-rank ${rankClasses[i]}">${rankLabels[i]}</span>
+          <span class="lb-label ${isActive ? 'active-arch' : ''}">${ARCH_LABELS[item.key] || item.key}</span>
+          <div class="lb-bar-wrap">
+            <div class="lb-bar ${isActive ? 'active-bar' : ''}" data-pct="${pct}" style="width:0%"></div>
+          </div>
+          <span class="lb-count ${isActive ? 'active-count' : ''}">${item.count}</span>
+        </div>`;
+    });
+
+    lbContent.innerHTML = html;
+    lbTotal.textContent = `${data.total} avatar${data.total > 1 ? 's' : ''} généré${data.total > 1 ? 's' : ''} aujourd'hui`;
+    lbTotal.style.display = 'block';
+
+    // Anime les barres après rendu
+    requestAnimationFrame(() => {
+      document.querySelectorAll('.lb-bar').forEach(bar => {
+        const pct = bar.dataset.pct;
+        setTimeout(() => { bar.style.width = pct + '%'; }, 80);
+      });
+    });
+
+  } catch(e) {
+    lbContent.innerHTML = '<div class="lb-loading">Stats indisponibles</div>';
+  }
 }
 
 // ════════════════════════════════════════
