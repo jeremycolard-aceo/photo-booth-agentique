@@ -226,14 +226,30 @@ async function loadImageAndEffects(imageSrc) {
   try {
     const img = await loadImg(imageSrc);
 
-    // Analyse basse-résolution pour trouver les zones brillantes
-    const W = 256;
-    const H = Math.round(256 * img.naturalHeight / img.naturalWidth) || 256;
+    // Analyse basse-résolution pour trouver les zones brillantes avec le ratio 3:4 de la carte (object-fit: cover)
+    const W = 300;
+    const H = 400;
 
     const analyseCanvas = document.createElement('canvas');
     analyseCanvas.width = W; analyseCanvas.height = H;
     const actx = analyseCanvas.getContext('2d');
-    actx.drawImage(img, 0, 0, W, H);
+    
+    // Algorithme de recadrage "cover" identique à object-fit: cover
+    const iw = img.naturalWidth || img.width;
+    const ih = img.naturalHeight || img.height;
+    const destRatio = W / H;
+    const imgRatio = iw / ih;
+    
+    let sx = 0, sy = 0, sw = iw, sh = ih;
+    if (imgRatio > destRatio) {
+      sw = ih * destRatio;
+      sx = (iw - sw) * 0.5; // Recadrage horizontal centré
+    } else {
+      sh = iw / destRatio;
+      sy = (ih - sh) * 0.5; // Recadrage vertical centré
+    }
+    
+    actx.drawImage(img, sx, sy, sw, sh, 0, 0, W, H);
     const imageData = actx.getImageData(0, 0, W, H);
     const data = imageData.data;
 
