@@ -1049,7 +1049,48 @@ function getAudio() {
   return audioCtx;
 }
 function resumeAudio() { if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume(); }
+// Configuration des particules
+let particles = [];
+const particleCount = 50; // Ajuste le nombre selon tes besoins
 
+function initParticles() {
+    particles = [];
+    for (let i = 0; i < particleCount; i++) {
+        particles.push({
+            x: Math.random() * canvas.width,
+            y: Math.random() * canvas.height,
+            size: Math.random() * 2 + 0.5,
+            speedX: (Math.random() - 0.5) * 0.4,
+            speedY: (Math.random() - 0.5) * 0.4,
+            alpha: Math.random()
+        });
+    }
+}
+   function drawParticles(pulse) {
+    ctx.save();
+    // Les particules brillent en même temps que le boost lumineux
+    ctx.globalAlpha = 0.4 + (pulse * 0.6);
+    ctx.fillStyle = "white";
+    ctx.shadowBlur = 8 * pulse;
+    ctx.shadowColor = "rgba(255, 255, 255, 0.8)";
+
+    particles.forEach(p => {
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Animation des positions
+        p.x += p.speedX;
+        p.y += p.speedY;
+
+        // Téléportation de l'autre côté si sortie du cadre (effet infini)
+        if (p.x < 0) p.x = canvas.width;
+        if (p.x > canvas.width) p.x = 0;
+        if (p.y < 0) p.y = canvas.height;
+        if (p.y > canvas.height) p.y = 0;
+    });
+    ctx.restore();
+}
 function playSynthHover() {
   try {
     const ctx = getAudio(); const osc = ctx.createOscillator(); const gain = ctx.createGain();
@@ -1473,26 +1514,29 @@ async function startLightEffect(imgSrc, pulseCanvas, partCanvas, particleCount =
   const particles = Array.from({ length: particleCount }, () => new Particle());
 
   function animate() {
-    if (!running) return;
-    syncSize();
-    const W = pulseCanvas.width, H = pulseCanvas.height;
-    if (maskCanvas) {
-      const pulseCtx = pulseCanvas.getContext('2d');
-      pulseCtx.clearRect(0, 0, W, H);
-      const t = performance.now() / 1000;
-      const pulse = (Math.sin(t * Math.PI * 0.8) + 1) / 2;
-      pulseCtx.save();
-      pulseCtx.globalAlpha = 0.15 + pulse * 0.35;
-      pulseCtx.shadowBlur = 12 + pulse * 18;
-      pulseCtx.shadowColor = 'rgba(66,133,244,0.8)';
-      pulseCtx.drawImage(maskCanvas, 0, 0, W, H);
-      pulseCtx.restore();
-    }
-    const pCtx = partCanvas.getContext('2d');
-    pCtx.clearRect(0, 0, W, H);
-    for (const p of particles) { p.update(); p.draw(pCtx); }
-    raf = requestAnimationFrame(animate);
-  }
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    
+    const time = performance.now() / 1000; 
+    const pulse = (Math.sin(time * 2.5) + 1) / 2; // Fréquence de pulsation
+    
+    // 1. Image de base
+    ctx.globalAlpha = 1.0;
+    ctx.drawImage(img, 0, 0);
+
+    // 2. Particules (entre l'image et le glow)
+    drawParticles(pulse);
+
+    // 3. Effet Boost Lumineux (Screen mode)
+    ctx.save();
+    ctx.globalCompositeOperation = "screen"; 
+    ctx.globalAlpha = 0.1 + (pulse * 0.7); // Intensité du boost
+    ctx.shadowBlur = 35 * pulse;           // Étendue de la lueur
+    ctx.shadowColor = "white";
+    ctx.drawImage(maskCanvas, 0, 0);
+    ctx.restore();
+
+    requestAnimationFrame(animate);
+}
   animate();
 
   return function stop() {
