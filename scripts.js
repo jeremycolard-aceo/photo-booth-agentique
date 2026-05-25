@@ -51,6 +51,7 @@ SETTING & THEME: ${arch.scene}`;
 let selectedArch = null, userName = '', userEmail = '';
 let camStream = null, capturedB64 = null, resultImage = null;
 let currentFileId = null;
+let resultThumbnailUrl = null; // Ajout pour le QR code
 let idleInterval = null, idleSeconds = 0, countdownInt = null, loadingMsgInterval = null;
 let genProgressInterval = null;
 
@@ -212,32 +213,20 @@ function showScreen(id) {
 // ════════════════════════════════════════
 //  IFRAME CARD — communication postMessage
 // ════════════════════════════════════════
-
-/**
- * Envoie les données de la carte à l'iframe card.html.
- * On attend que l'iframe soit prête (event "CARD_READY") ou on réessaie après délai.
- */
 let cardIframeReady = false;
 
 function getCardIframe() { return document.getElementById('card-iframe'); }
 
-// Écoute le signal "CARD_READY" de l'iframe
 window.addEventListener('message', (e) => {
   if (e.data && e.data.type === 'CARD_READY') {
     cardIframeReady = true;
   }
 });
 
-/**
- * Envoie les données carte à l'iframe.
- * Si l'iframe n'est pas encore prête, on attend 200ms et on réessaie (max 20 fois).
- */
 function sendCardData(imageSrc, name, archLabel, attempts = 0) {
   const iframe = getCardIframe();
   if (!iframe) return;
-
   const payload = { type: 'CARD_DATA', imageSrc, name, archLabel };
-
   if (cardIframeReady || attempts > 20) {
     iframe.contentWindow.postMessage(payload, '*');
   } else {
@@ -400,6 +389,9 @@ async function generateAvatar() {
   }
 
   currentFileId = resultData.fileId || null;
+  
+  // Définit l'URL pour le QR Code (privilégie l'API, sinon construit un lien générique Drive)
+  resultThumbnailUrl = resultData.thumbnailUrl || (currentFileId ? `https://drive.google.com/thumbnail?id=${currentFileId}&sz=w1200` : null);
 
   try { resultImage = await addLogo(resultData.image); }
   catch { resultImage = resultData.image; }
@@ -427,7 +419,7 @@ async function addLogo(base64) {
 }
 
 // ════════════════════════════════════════
-//  REVEAL CINÉMATIQUE (simplifié, dans index.html)
+//  REVEAL CINÉMATIQUE
 // ════════════════════════════════════════
 let revealParticlesRAF = null;
 
@@ -448,7 +440,6 @@ async function cinemaReveal(imgSrc) {
   revealImg.classList.add('reveal-anim'); playSynthReveal();
   await sleep(400);
 
-  // Petits particules dorées autour du reveal
   startRevealParticles(revealPartCanvas, revealImg);
 }
 
@@ -511,7 +502,7 @@ function confirmReveal() {
 }
 
 // ════════════════════════════════════════
-//  RÉSULTAT
+//  RÉSULTAT (Mise à jour avec QR Code)
 // ════════════════════════════════════════
 function showResult() {
   const arch = ARCHETYPES[selectedArch];
@@ -521,13 +512,30 @@ function showResult() {
   hideStatus();
   showScreen('screen-result');
 
+  // Génération du QR Code
+  const qrSection = document.getElementById('qr-section');
+  const qrContainer = document.getElementById('qr-code-container');
+  qrContainer.innerHTML = '';
+  
+  if (resultThumbnailUrl) {
+    new QRCode(qrContainer, {
+      text: resultThumbnailUrl,
+      width: 88,
+      height: 88,
+      colorDark : "#262F63",
+      colorLight : "#ffffff",
+      correctLevel : QRCode.CorrectLevel.L
+    });
+    qrSection.style.display = 'flex';
+  } else {
+    qrSection.style.display = 'none';
+  }
+
   // Réinitialise l'iframe et lui envoie les nouvelles données
   cardIframeReady = false;
   const iframe = getCardIframe();
-  // Recharge l'iframe pour repartir d'un état propre
   iframe.src = 'card.html';
   iframe.onload = () => {
-    // On attend un tout petit peu que les scripts s'initialisent
     setTimeout(() => {
       sendCardData(resultImage, userName, arch.label);
     }, 150);
@@ -681,7 +689,7 @@ function hideStatus() { document.getElementById('result-status').className = 're
 
 function resetAll(silent) {
   selectedArch = null; userName = ''; userEmail = '';
-  capturedB64 = null; resultImage = null; currentFileId = null;
+  capturedB64 = null; resultImage = null; currentFileId = null; resultThumbnailUrl = null;
   cardIframeReady = false;
   if (camStream)           { camStream.getTracks().forEach(t => t.stop()); camStream = null; }
   if (countdownInt)        { clearInterval(countdownInt); countdownInt = null; }
@@ -694,7 +702,7 @@ function resetAll(silent) {
   document.getElementById('gen-white-flash').className = '';
   document.getElementById('form-overlay').classList.remove('open');
   document.getElementById('gallery-lightbox').classList.remove('open');
-  // Réinitialise l'iframe
+  
   const iframe = getCardIframe();
   if (iframe) iframe.src = 'card.html';
   if (!silent) showScreen('screen-choose');
