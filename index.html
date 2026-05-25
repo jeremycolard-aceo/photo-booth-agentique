@@ -456,17 +456,28 @@ canvas { display: none; }
 #gen-white-flash.flash-in  { opacity: 1; transition: opacity 0.12s ease; }
 #gen-white-flash.flash-out { opacity: 0; transition: opacity 0.8s ease; }
 
+/* ══════════════════════════════════
+   REVEAL CINÉMATIQUE — avec effet lumineux
+══════════════════════════════════ */
 #gen-result-reveal {
   display: none; position: fixed; inset: 0; z-index: 202;
   background: var(--bleu-nuit);
   flex-direction: column; align-items: center; justify-content: center;
 }
 #gen-result-reveal.show { display: flex; }
+
+/* Wrapper position relative pour superposer canvas de particules */
+#reveal-img-wrapper {
+  position: relative;
+  display: flex; align-items: center; justify-content: center;
+}
 #gen-result-reveal img {
-  max-height: 90vh; max-width: 90vw; object-fit: contain;
+  max-height: 75vh; max-width: 80vw; object-fit: contain;
   border-radius: 4px; border: 2px solid var(--blanc);
   box-shadow: 0 0 50px rgba(0,0,0,0.5);
   opacity: 0; transform: scale(0.9);
+  display: block;
+  position: relative; z-index: 1;
 }
 #gen-result-reveal img.reveal-anim { animation: big-reveal 1.2s cubic-bezier(0.22,1,0.36,1) forwards; }
 @keyframes big-reveal {
@@ -475,13 +486,32 @@ canvas { display: none; }
   to   { opacity: 1; transform: scale(1); filter: brightness(1) blur(0); }
 }
 
+/* Canvas de particules superposé au reveal */
+#reveal-particles-canvas {
+  position: absolute; inset: 0; z-index: 2;
+  pointer-events: none;
+  border-radius: 4px;
+}
+
+/* Canvas masque lumineux pour le reveal (pulsation) */
+#reveal-mask-canvas {
+  position: absolute; inset: 0; z-index: 3;
+  pointer-events: none;
+  border-radius: 4px;
+  opacity: 0;
+  mix-blend-mode: screen;
+  transition: opacity 0.6s ease;
+}
+#reveal-mask-canvas.active { opacity: 1; }
+
 #gen-result-cta {
-  margin-top: 32px; font-family: 'Black Ops One', cursive;
+  margin-top: 28px; font-family: 'Black Ops One', cursive;
   font-size: 20px; text-transform: uppercase;
   color: var(--blanc); cursor: pointer;
   border: 2px solid var(--bleu-google);
   padding: 16px 40px; border-radius: 4px;
   background: var(--bleu-google); transition: all 0.2s;
+  position: relative; z-index: 10;
 }
 #gen-result-cta:hover { background: #3371db; transform: translateY(-2px); }
 
@@ -556,9 +586,24 @@ canvas { display: none; }
   object-fit: cover; display: block;
 }
 
+/* Canvas masque de pulsation lumineuse sur la carte */
+#card-pulse-canvas {
+  position: absolute; inset: 0; z-index: 2;
+  pointer-events: none;
+  border-radius: 16px;
+  mix-blend-mode: screen;
+}
+
+/* Canvas de particules sur la carte (dessus du masque) */
+#card-particles-overlay {
+  position: absolute; inset: 0; z-index: 3;
+  pointer-events: none;
+  border-radius: 16px;
+}
+
 /* Reflet holographique qui suit la souris */
 .hero-card .card-shine {
-  position: absolute; inset: 0; z-index: 3;
+  position: absolute; inset: 0; z-index: 4;
   background: radial-gradient(
     circle at var(--mx, 50%) var(--my, 50%),
     rgba(255,255,255,0.18) 0%,
@@ -573,7 +618,7 @@ canvas { display: none; }
 
 /* Overlay dégradé bas de carte */
 .hero-card .card-overlay {
-  position: absolute; inset: 0; z-index: 2;
+  position: absolute; inset: 0; z-index: 5;
   background: linear-gradient(
     to bottom,
     transparent 45%,
@@ -584,7 +629,7 @@ canvas { display: none; }
 
 /* Contenu texte de la carte */
 .hero-card .card-content {
-  position: absolute; bottom: 0; left: 0; right: 0; z-index: 4;
+  position: absolute; bottom: 0; left: 0; right: 0; z-index: 6;
   padding: 20px 22px 22px;
 }
 
@@ -622,14 +667,14 @@ canvas { display: none; }
 
 /* Logo ACEO en bas à droite de la carte */
 .hero-card .card-logo {
-  position: absolute; bottom: 18px; right: 18px; z-index: 5;
+  position: absolute; bottom: 18px; right: 18px; z-index: 7;
   height: 36px; opacity: 0.95;
 }
 
 /* Bordure brillante de la carte */
 .hero-card::before {
   content: '';
-  position: absolute; inset: 0; z-index: 6;
+  position: absolute; inset: 0; z-index: 8;
   border-radius: 16px;
   border: 1.5px solid rgba(255,255,255,0.25);
   pointer-events: none;
@@ -776,7 +821,11 @@ canvas { display: none; }
 </div>
 
 <div id="gen-result-reveal">
-  <img id="reveal-img" src="" alt="Avatar révélé">
+  <div id="reveal-img-wrapper">
+    <img id="reveal-img" src="" alt="Avatar révélé">
+    <canvas id="reveal-particles-canvas"></canvas>
+    <canvas id="reveal-mask-canvas"></canvas>
+  </div>
   <button id="gen-result-cta" onclick="confirmReveal()">Voir mon profil →</button>
 </div>
 
@@ -872,6 +921,10 @@ canvas { display: none; }
       <div class="card-tilt-wrapper" id="card-tilt-wrapper">
         <div class="hero-card" id="hero-card">
           <img class="card-photo" id="result-img" src="" alt="Votre avatar">
+          <!-- Canvas pulsation lumineuse sur la carte -->
+          <canvas id="card-pulse-canvas"></canvas>
+          <!-- Canvas particules sur la carte -->
+          <canvas id="card-particles-overlay"></canvas>
           <div class="card-overlay"></div>
           <div class="card-shine" id="card-shine"></div>
           <div class="card-content">
@@ -951,6 +1004,11 @@ const API_URL  = 'https://script.google.com/macros/s/AKfycbz8HfEmA9QsfGTiRvr6lfD
 const SECRET   = 'ton-uuid-secret';
 const LOGO_URL = 'https://raw.githubusercontent.com/jeremycolard-aceo/photo-booth-agentique/main/logo-aceo.png';
 const IDLE_TIMEOUT = 120;
+
+// Seuil de luminosité pour l'effet particules (75% de 255)
+const BRIGHTNESS_THRESHOLD = 191;
+// Couleurs des particules : bleu google et orange ambre ACEO
+const PARTICLE_COLORS = ['66,133,244', '246,161,25', '255,255,255'];
 
 // ════════════════════════════════════════
 //  AUDIO ENGINE
@@ -1105,13 +1163,13 @@ function exitVideo() {
 }
 function goToSleep() {
   clearInterval(idleInterval); unbindIdleEvents(); resetAll(true);
-  stopParticles();
+  stopAllParticleEffects();
   document.getElementById('app').classList.remove('visible');
   document.getElementById('screen-video').style.display = 'flex';
   document.getElementById('idle-video').play().catch(()=>{});
 }
 function goHome() {
-  playSynthClick(); resetAll(true); stopParticles();
+  playSynthClick(); resetAll(true); stopAllParticleEffects();
   document.getElementById('app').classList.remove('visible');
   document.getElementById('screen-video').style.display = 'flex';
   document.getElementById('idle-video').play().catch(()=>{});
@@ -1171,8 +1229,8 @@ function submitForm() {
 async function goCapture() {
   const arch = ARCHETYPES[selectedArch];
   const capVideo = document.getElementById('cap-arch-video');
-capVideo.src = arch.videoSrc;
-capVideo.play().catch(() => {});
+  capVideo.src = arch.videoSrc;
+  capVideo.play().catch(() => {});
   document.getElementById('cap-arch-label').textContent = arch.label;
   document.getElementById('cap-username').textContent = userName;
   showScreen('screen-capture'); await initCam();
@@ -1264,10 +1322,206 @@ async function generateAvatar() {
   await cinemaReveal(resultImage);
 }
 
+// ════════════════════════════════════════
+//  EFFET LUMINEUX — CŒUR DE LA MAGIE
+//  Analyse l'image, trouve les zones > 75% de luminosité,
+//  génère un masque pulsant et des particules qui en émanent
+// ════════════════════════════════════════
+
+/**
+ * Analyse une image (src base64) et retourne la liste des pixels brillants
+ * @param {string} imgSrc - URL ou base64 de l'image
+ * @param {number} w - largeur cible pour l'analyse (réduit pour perf)
+ * @param {number} h - hauteur cible pour l'analyse
+ * @returns {Promise<{brightPixels: Array, maskCanvas: HTMLCanvasElement}>}
+ */
+async function buildLightMask(imgSrc, w, h) {
+  const img = await loadImg(imgSrc);
+  
+  // Canvas d'analyse (taille réduite pour perf)
+  const analyseCanvas = document.createElement('canvas');
+  analyseCanvas.width = w; analyseCanvas.height = h;
+  const analyseCtx = analyseCanvas.getContext('2d');
+  analyseCtx.drawImage(img, 0, 0, w, h);
+  
+  const imageData = analyseCtx.getImageData(0, 0, w, h);
+  const data = imageData.data;
+  const brightPixels = [];
+  
+  for (let i = 0; i < data.length; i += 4) {
+    const r = data[i], g = data[i+1], b = data[i+2];
+    // Luminosité perceptuelle (formule ITU-R BT.709)
+    const brightness = 0.2126 * r + 0.7152 * g + 0.0722 * b;
+    
+    if (brightness < BRIGHTNESS_THRESHOLD) {
+      data[i + 3] = 0; // zone sombre → transparent dans le masque
+    } else {
+      // 1 pixel sur 15 seulement pour ne pas surcharger
+      if (Math.random() > 0.93) {
+        const pixelIndex = i / 4;
+        brightPixels.push({
+          x: (pixelIndex % w) / w, // coordonnées normalisées 0-1
+          y: Math.floor(pixelIndex / w) / h
+        });
+      }
+    }
+  }
+  analyseCtx.putImageData(imageData, 0, 0);
+  
+  return { brightPixels, maskCanvas: analyseCanvas };
+}
+
+/**
+ * Crée et anime la pulsation lumineuse + particules sur un canvas cible
+ * @param {string} imgSrc         - image source
+ * @param {HTMLCanvasElement} pulseCanvas  - canvas pour la pulsation (mix-blend: screen)
+ * @param {HTMLCanvasElement} partCanvas   - canvas pour les particules
+ * @param {number} particleCount  - nombre de particules
+ * @returns {Function} stopFn - appeler pour arrêter l'animation
+ */
+async function startLightEffect(imgSrc, pulseCanvas, partCanvas, particleCount = 60) {
+  let running = true;
+  let raf = null;
+  
+  // Dimensions des canvas (prises du parent)
+  function syncSize() {
+    const parent = pulseCanvas.parentElement;
+    if (!parent) return;
+    const w = parent.offsetWidth;
+    const h = parent.offsetHeight;
+    if (pulseCanvas.width !== w || pulseCanvas.height !== h) {
+      pulseCanvas.width = w; pulseCanvas.height = h;
+      partCanvas.width = w; partCanvas.height = h;
+    }
+  }
+  syncSize();
+  
+  // Analyse de l'image à taille réduite (256x341 suffit)
+  const analysisW = 256;
+  const analysisH = Math.round(analysisW * (pulseCanvas.height / pulseCanvas.width || 1.33));
+  
+  let brightPixels = [];
+  let maskCanvas = null;
+  try {
+    const result = await buildLightMask(imgSrc, analysisW, analysisH);
+    brightPixels = result.brightPixels;
+    maskCanvas = result.maskCanvas;
+  } catch(e) {
+    // Si l'analyse échoue (CORS etc.), on utilise des positions aléatoires
+    for (let i = 0; i < 40; i++) {
+      brightPixels.push({ x: Math.random(), y: Math.random() * 0.7 });
+    }
+  }
+  
+  // ── Classe Particle ──
+  class Particle {
+    constructor() { this.reset(); }
+    reset() {
+      if (brightPixels.length > 0) {
+        const pt = brightPixels[Math.floor(Math.random() * brightPixels.length)];
+        this.x = pt.x * partCanvas.width + (Math.random() - 0.5) * 20;
+        this.y = pt.y * partCanvas.height + (Math.random() - 0.5) * 20;
+      } else {
+        this.x = Math.random() * partCanvas.width;
+        this.y = Math.random() * partCanvas.height;
+      }
+      this.size = Math.random() * 2.5 + 0.8;
+      this.speedX = (Math.random() - 0.5) * 1.2;
+      this.speedY = -(Math.random() * 1.5 + 0.3); // monte vers le haut
+      this.life = 1.0;
+      this.decay = Math.random() * 0.018 + 0.006;
+      this.color = PARTICLE_COLORS[Math.floor(Math.random() * PARTICLE_COLORS.length)];
+    }
+    update() {
+      this.x += this.speedX;
+      this.y += this.speedY;
+      this.life -= this.decay;
+      if (this.life <= 0) this.reset();
+    }
+    draw(ctx) {
+      ctx.beginPath();
+      ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(${this.color},${this.life * 0.85})`;
+      ctx.fill();
+    }
+  }
+  
+  // Initialise les particules
+  const particles = Array.from({ length: particleCount }, () => new Particle());
+  
+  // ── Boucle d'animation ──
+  function animate() {
+    if (!running) return;
+    syncSize();
+    
+    const W = pulseCanvas.width;
+    const H = pulseCanvas.height;
+    
+    // 1. Pulsation lumineuse (canvas pulse)
+    if (maskCanvas) {
+      const pulseCtx = pulseCanvas.getContext('2d');
+      pulseCtx.clearRect(0, 0, W, H);
+      
+      const t = performance.now() / 1000;
+      const pulse = (Math.sin(t * Math.PI * 0.8) + 1) / 2; // oscille entre 0 et 1
+      
+      pulseCtx.save();
+      pulseCtx.globalAlpha = 0.15 + pulse * 0.35;
+      // Filtre glow subtil via shadow
+      pulseCtx.shadowBlur = 12 + pulse * 18;
+      pulseCtx.shadowColor = 'rgba(66,133,244,0.8)';
+      pulseCtx.drawImage(maskCanvas, 0, 0, W, H);
+      pulseCtx.restore();
+    }
+    
+    // 2. Particules
+    const pCtx = partCanvas.getContext('2d');
+    pCtx.clearRect(0, 0, W, H);
+    for (const p of particles) {
+      p.update();
+      p.draw(pCtx);
+    }
+    
+    raf = requestAnimationFrame(animate);
+  }
+  
+  animate();
+  
+  // Retourne la fonction stop
+  return function stop() {
+    running = false;
+    if (raf) cancelAnimationFrame(raf);
+    const pc = pulseCanvas.getContext('2d');
+    if (pc) pc.clearRect(0, 0, pulseCanvas.width, pulseCanvas.height);
+    const ptc = partCanvas.getContext('2d');
+    if (ptc) ptc.clearRect(0, 0, partCanvas.width, partCanvas.height);
+  };
+}
+
+// Références aux fonctions stop des effets actifs
+let stopCardEffect = null;
+let stopRevealEffect = null;
+
+function stopAllParticleEffects() {
+  if (stopCardEffect) { stopCardEffect(); stopCardEffect = null; }
+  if (stopRevealEffect) { stopRevealEffect(); stopRevealEffect = null; }
+  stopParticles(); // particules de fond
+}
+
+// ════════════════════════════════════════
+//  CINEMA REVEAL — avec effet lumineux activé
+// ════════════════════════════════════════
 async function cinemaReveal(imgSrc) {
+  // Stop tout effet réveal précédent
+  if (stopRevealEffect) { stopRevealEffect(); stopRevealEffect = null; }
+  
   const revealDiv = document.getElementById('gen-result-reveal');
   const revealImg = document.getElementById('reveal-img');
-  revealImg.src = imgSrc; revealImg.classList.remove('reveal-anim');
+  const revealPartCanvas = document.getElementById('reveal-particles-canvas');
+  const revealMaskCanvas = document.getElementById('reveal-mask-canvas');
+  
+  revealImg.src = imgSrc;
+  revealImg.classList.remove('reveal-anim');
 
   const whiteFlash = document.getElementById('gen-white-flash');
   whiteFlash.classList.add('flash-in'); await sleep(120);
@@ -1276,12 +1530,45 @@ async function cinemaReveal(imgSrc) {
   await sleep(200); whiteFlash.classList.remove('flash-out');
 
   revealImg.classList.add('reveal-anim'); playSynthReveal();
+  
+  // Lance l'effet lumineux après que l'image soit chargée/dimensionnée
+  await sleep(400); // petit délai pour que le layout soit stable
+  
+  // Sync la taille des canvas réveal sur l'image
+  function syncRevealCanvases() {
+    const rect = revealImg.getBoundingClientRect();
+    if (rect.width > 0 && rect.height > 0) {
+      revealPartCanvas.width = rect.width;
+      revealPartCanvas.height = rect.height;
+      revealMaskCanvas.width = rect.width;
+      revealMaskCanvas.height = rect.height;
+      // Position les canvas exactement sur l'image
+      revealPartCanvas.style.width = rect.width + 'px';
+      revealPartCanvas.style.height = rect.height + 'px';
+      revealMaskCanvas.style.width = rect.width + 'px';
+      revealMaskCanvas.style.height = rect.height + 'px';
+    }
+  }
+  syncRevealCanvases();
+  
+  revealMaskCanvas.classList.add('active');
+  
+  // Démarre l'effet sur l'écran de révélation
+  stopRevealEffect = await startLightEffect(
+    imgSrc,
+    revealMaskCanvas,
+    revealPartCanvas,
+    80 // plus de particules pour le drama du reveal
+  );
 }
 
 function confirmReveal() {
   playSynthClick();
+  // Stop l'effet du reveal mais garde les données pour la carte
+  if (stopRevealEffect) { stopRevealEffect(); stopRevealEffect = null; }
   document.getElementById('gen-result-reveal').classList.remove('show');
   document.getElementById('reveal-img').classList.remove('reveal-anim');
+  document.getElementById('reveal-mask-canvas').classList.remove('active');
   showResult();
 }
 
@@ -1314,16 +1601,36 @@ function showResult() {
 
   hideStatus(); showScreen('screen-result');
 
-  // Lance particules + tilt + stats en parallèle
-  requestAnimationFrame(() => {
-    initParticles();
-    initCardTilt();
-    loadLeaderboard();
+  // Lance tout en parallèle après le rendu
+  requestAnimationFrame(async () => {
+    initParticles();    // particules de fond (zone gauche)
+    initCardTilt();     // effet 3D de la carte
+    loadLeaderboard();  // stats live
+
+    // Lance l'effet lumineux sur la carte
+    const pulseCanvas = document.getElementById('card-pulse-canvas');
+    const partCanvas = document.getElementById('card-particles-overlay');
+
+    // Attend que la carte soit rendue pour lire ses dimensions
+    await sleep(100);
+    const card = document.getElementById('hero-card');
+    pulseCanvas.width  = card.offsetWidth;
+    pulseCanvas.height = card.offsetHeight;
+    partCanvas.width   = card.offsetWidth;
+    partCanvas.height  = card.offsetHeight;
+
+    if (stopCardEffect) stopCardEffect();
+    stopCardEffect = await startLightEffect(
+      resultImage,
+      pulseCanvas,
+      partCanvas,
+      50 // 50 particules sur la carte
+    );
   });
 }
 
 // ════════════════════════════════════════
-//  PARTICULES CANVAS
+//  PARTICULES CANVAS (fond zone gauche — inchangé)
 // ════════════════════════════════════════
 let particlesRAF = null;
 
@@ -1342,7 +1649,6 @@ function initParticles() {
     vx: (Math.random() - 0.5) * 0.35,
     vy: (Math.random() - 0.55) * 0.45,
     opacity: Math.random() * 0.4 + 0.1,
-    // couleur : bleu google ou orange ambre
     color: Math.random() > 0.6 ? '246,161,25' : '66,133,244'
   }));
 
@@ -1357,11 +1663,9 @@ function initParticles() {
       p.x += p.vx;
       p.y += p.vy;
 
-      // rebond doux sur les bords
       if (p.x < 0 || p.x > canvas.width)  p.vx *= -1;
       if (p.y < 0 || p.y > canvas.height) p.vy *= -1;
 
-      // scintillement léger
       p.opacity += (Math.random() - 0.5) * 0.012;
       p.opacity = Math.max(0.05, Math.min(0.55, p.opacity));
     }
@@ -1377,7 +1681,7 @@ function stopParticles() {
 }
 
 // ════════════════════════════════════════
-//  TILT 3D CARTE
+//  TILT 3D CARTE (inchangé)
 // ════════════════════════════════════════
 function initCardTilt() {
   const wrapper = document.getElementById('card-tilt-wrapper');
@@ -1385,7 +1689,6 @@ function initCardTilt() {
   const shine   = document.getElementById('card-shine');
 
   let targetRX = 0, targetRY = 0, currentRX = 0, currentRY = 0;
-  let tiltRAF = null;
 
   function lerp(a, b, t) { return a + (b - a) * t; }
 
@@ -1393,7 +1696,7 @@ function initCardTilt() {
     currentRX = lerp(currentRX, targetRX, 0.1);
     currentRY = lerp(currentRY, targetRY, 0.1);
     card.style.transform = `rotateX(${currentRX}deg) rotateY(${currentRY}deg) scale(1.02)`;
-    tiltRAF = requestAnimationFrame(animateTilt);
+    requestAnimationFrame(animateTilt);
   }
   animateTilt();
 
@@ -1401,14 +1704,12 @@ function initCardTilt() {
     const rect = wrapper.getBoundingClientRect();
     const cx = rect.left + rect.width  / 2;
     const cy = rect.top  + rect.height / 2;
-    const dx = (e.clientX - cx) / (rect.width  / 2);  // -1 à 1
-    const dy = (e.clientY - cy) / (rect.height / 2);  // -1 à 1
+    const dx = (e.clientX - cx) / (rect.width  / 2);
+    const dy = (e.clientY - cy) / (rect.height / 2);
 
-    // tilt max ±8°
     targetRY =  dx * 8;
     targetRX = -dy * 8;
 
-    // reflet holographique suit le curseur
     const mx = ((e.clientX - rect.left) / rect.width  * 100).toFixed(1);
     const my = ((e.clientY - rect.top)  / rect.height * 100).toFixed(1);
     shine.style.setProperty('--mx', mx + '%');
@@ -1424,13 +1725,10 @@ function initCardTilt() {
   wrapper.addEventListener('mouseenter', () => {
     card.style.boxShadow = '0 28px 70px rgba(38,47,99,0.45), 0 8px 24px rgba(66,133,244,0.15)';
   });
-
-  // Nettoyage si on quitte l'écran
-  wrapper._tiltRAF = tiltRAF;
 }
 
 // ════════════════════════════════════════
-//  LEADERBOARD
+//  LEADERBOARD (inchangé)
 // ════════════════════════════════════════
 const ARCH_LABELS = {
   'security-sentinel': '🛡️ Security Sentinel',
@@ -1456,7 +1754,6 @@ async function loadLeaderboard() {
       return;
     }
 
-    // Tri décroissant
     const sorted = Object.entries(data.counts)
       .map(([k, v]) => ({ key: k, count: v }))
       .sort((a, b) => b.count - a.count);
@@ -1484,7 +1781,6 @@ async function loadLeaderboard() {
     lbTotal.textContent = `${data.total} avatar${data.total > 1 ? 's' : ''} généré${data.total > 1 ? 's' : ''} aujourd'hui`;
     lbTotal.style.display = 'block';
 
-    // Anime les barres après rendu
     requestAnimationFrame(() => {
       document.querySelectorAll('.lb-bar').forEach(bar => {
         const pct = bar.dataset.pct;
@@ -1529,6 +1825,7 @@ function resetAll(silent) {
   document.getElementById('gen-result-reveal').classList.remove('show');
   document.getElementById('gen-white-flash').className = '';
   document.getElementById('form-overlay').classList.remove('open');
+  stopAllParticleEffects();
   if (!silent) showScreen('screen-choose');
 }
 
