@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Card</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Black+Ops+One&family=Share+Tech+Mono&family=Rajdhani:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body {
+  width: 100%; height: 100%;
+  overflow: hidden;
+  background: transparent;
+}
+
+:root {
+  --bleu-nuit:   #262F63;
+  --bleu-google: #4285F4;
+  --bleu-canard: #255870;
+  --orange-ambre:#F6A119;
+  --blanc-casse: #F4F5F5;
+  --blanc:       #ffffff;
+}
+
+/* ── ZONE GAUCHE : canvas particules + carte ── */
+.result-left {
+  width: 100%; height: 100%;
+  position: relative;
+  display: flex; align-items: center; justify-content: center;
+  padding: 28px 20px 28px 44px;
+  overflow: hidden;
+}
+
+#particles-canvas {
+  position: absolute; inset: 0; z-index: 0;
+  pointer-events: none;
+}
+
+.card-tilt-wrapper {
+  position: relative; z-index: 1;
+  width: 100%; max-width: 420px;
+  perspective: 900px;
+  cursor: default;
+}
+
+/* ── TRADING CARD ── */
+.hero-card {
+  position: relative; width: 100%; aspect-ratio: 3/4;
+  border-radius: 16px; overflow: hidden;
+  transform-style: preserve-3d;
+  transition: box-shadow 0.12s ease-out;
+  box-shadow: 0 20px 60px rgba(38, 47, 99, 0.35), 0 4px 16px rgba(38, 47, 99, 0.15);
+  will-change: transform;
+}
+.hero-card .card-photo {
+  position: absolute; inset: 0; width: 100%; height: 100%;
+  object-fit: cover; display: block;
+}
+
+/* Canvas effets lumineux par-dessus la photo */
+#card-light-canvas {
+  position: absolute; inset: 0; z-index: 2;
+  pointer-events: none; border-radius: 16px;
+  mix-blend-mode: screen;
+  opacity: 0; /* revealed after load */
+  transition: opacity 0.6s ease;
+}
+#card-light-canvas.ready { opacity: 1; }
+
+/* Canvas particules flottantes */
+#card-particles-canvas {
+  position: absolute; inset: 0; z-index: 3;
+  pointer-events: none; border-radius: 16px;
+}
+
+.hero-card .card-shine {
+  position: absolute; inset: 0; z-index: 4;
+  background: radial-gradient(circle at var(--mx, 50%) var(--my, 50%),
+    rgba(255,255,255,0.18) 0%, rgba(255,255,255,0.06) 30%, transparent 65%);
+  border-radius: 16px; pointer-events: none;
+  transition: background 0.08s; mix-blend-mode: screen;
+}
+.hero-card .card-overlay {
+  position: absolute; inset: 0; z-index: 5;
+  background: linear-gradient(to bottom, transparent 45%, rgba(38, 47, 99, 0.55) 70%, rgba(38, 47, 99, 0.92) 100%);
+}
+.hero-card .card-content {
+  position: absolute; bottom: 0; left: 0; right: 0; z-index: 6;
+  padding: 20px 22px 22px;
+}
+.hero-card .card-badge {
+  display: inline-block; font-family: 'Share Tech Mono', monospace;
+  font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase;
+  padding: 5px 12px; background: var(--bleu-google);
+  color: var(--blanc); border-radius: 3px; margin-bottom: 8px;
+}
+.hero-card .card-name {
+  font-family: 'Black Ops One', cursive;
+  font-size: clamp(22px, 2.8vw, 36px); color: var(--blanc);
+  text-transform: uppercase; letter-spacing: 0.04em;
+  line-height: 1; text-shadow: 0 2px 8px rgba(0,0,0,0.6);
+}
+.hero-card .card-arch {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 13px; letter-spacing: 0.1em;
+  color: rgba(255,255,255,0.7); text-transform: uppercase; margin-top: 4px;
+}
+.hero-card .card-logo {
+  position: absolute; bottom: 18px; right: 18px; z-index: 7;
+  height: 36px; opacity: 0.95;
+}
+.hero-card::before {
+  content: ''; position: absolute; inset: 0; z-index: 8;
+  border-radius: 16px; border: 1.5px solid rgba(255,255,255,0.25);
+  pointer-events: none;
+}
+</style>
+</head>
+<body>
+
+<div class="result-left">
+  <!-- Particules de fond (zone gauche) -->
+  <canvas id="particles-canvas"></canvas>
+
+  <!-- Carte 3D tiltable -->
+  <div class="card-tilt-wrapper" id="card-tilt-wrapper">
+    <div class="hero-card" id="hero-card">
+
+      <!-- Photo avatar -->
+      <img class="card-photo" id="card-photo" src="" alt="Votre avatar">
+
+      <!-- Canvas effets lumineux (screen blend, pulsation + masque zones brillantes) -->
+      <canvas id="card-light-canvas"></canvas>
+
+      <!-- Canvas particules flottantes (zones brillantes → particules qui montent) -->
+      <canvas id="card-particles-canvas"></canvas>
+
+      <div class="card-overlay"></div>
+      <div class="card-shine" id="card-shine"></div>
+
+      <div class="card-content">
+        <div class="card-badge" id="card-badge-arch">—</div>
+        <div class="card-name"  id="card-name">Prénom</div>
+        <div class="card-arch"  id="card-arch-sub">Archétype</div>
+      </div>
+
+      <img class="card-logo"
+           src="https://raw.githubusercontent.com/jeremycolard-aceo/photo-booth-agentique/main/logo-aceo.png"
+           alt="ACEO" onerror="this.style.display='none'">
+    </div>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════
+//  CONSTANTES
+// ═══════════════════════════════════════════════════════════
+const BRIGHTNESS_THRESHOLD = 191;
+const PARTICLE_COLORS = ['66,133,244', '246,161,25', '255,255,255'];
+const LOGO_URL = 'https://raw.githubusercontent.com/jeremycolard-aceo/photo-booth-agentique/main/logo-aceo.png';
+
+// ═══════════════════════════════════════════════════════════
+//  STATE
+// ═══════════════════════════════════════════════════════════
+let cardData = null;       // { imageSrc, name, archLabel }
+let cardEffectRAF = null;  // requestAnimationFrame de l'effet carte
+let bgParticlesRAF = null; // requestAnimationFrame des particules de fond
+let brightPixels = [];     // pixels brillants extraits de l'image
+let maskBitmap = null;     // ImageBitmap du masque lumineux
+
+// ═══════════════════════════════════════════════════════════
+//  SIGNAL "CARD_READY" → parent (index.html)
+//  Signale que l'iframe est initialisée et peut recevoir des données.
+// ═══════════════════════════════════════════════════════════
+window.parent.postMessage({ type: 'CARD_READY' }, '*');
+
+// ═══════════════════════════════════════════════════════════
+//  ÉCOUTE DES MESSAGES DU PARENT (index.html)
+// ═══════════════════════════════════════════════════════════
+window.addEventListener('message', (e) => {
+  if (!e.data || e.data.type !== 'CARD_DATA') return;
+  const { imageSrc, name, archLabel } = e.data;
+  setupCard(imageSrc, name, archLabel);
+});
+
+// ═══════════════════════════════════════════════════════════
+//  SETUP CARTE
+// ═══════════════════════════════════════════════════════════
+async function setupCard(imageSrc, name, archLabel) {
+  // Textes
+  document.getElementById('card-name').textContent     = name      || '—';
+  document.getElementById('card-arch-sub').textContent = archLabel || '—';
+  document.getElementById('card-badge-arch').textContent = archLabel || '—';
+
+  // Photo
+  const photoEl = document.getElementById('card-photo');
+  photoEl.src = imageSrc;
+
+  // Particules de fond
+  startBgParticles();
+
+  // Tilt
+  initCardTilt();
+
+  // Effets lumineux (on attend le chargement de l'image)
+  await loadImageAndEffects(imageSrc);
+}
+
+// ═══════════════════════════════════════════════════════════
+//  CHARGEMENT IMAGE + EXTRACTION PIXELS BRILLANTS
+// ═══════════════════════════════════════════════════════════
+function loadImg(src) {
+  return new Promise((res, rej) => {
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.onload = () => res(img);
+    img.onerror = () => rej(new Error('Image load failed: ' + src));
+    img.src = src;
+  });
+}
+
+async function loadImageAndEffects(imageSrc) {
+  stopCardEffect();
+
+  try {
+    const img = await loadImg(imageSrc);
+
+    // Analyse basse-résolution pour trouver les zones brillantes
+    const W = 256;
+    const H = Math.round(256 * img.naturalHeight / img.naturalWidth) || 256;
+
+    const analyseCanvas = document.createElement('canvas');
+    analyseCanvas.width = W; analyseCanvas.height = H;
+    const actx = analyseCanvas.getContext('2d');
+    actx.drawImage(img, 0, 0, W, H);
+    const imageData = actx.getImageData(0, 0, W, H);
+    const data = imageData.data;
+
+    brightPixels = [];
+    for (let i = 0; i < data.length; i += 4) {
+      const r = data[i], g = data[i + 1], b = data[i + 2];
+      const brightness = 0.2126 * r + 0.7152 * g + 0.0722 * b;
+      if (brightness < BRIGHTNESS_THRESHOLD) {
+        // Rend ce pixel transparent dans le masque
+        data[i + 3] = 0;
+      } else {
+        // Garde une sélection aléatoire de pixels brillants pour les particules
+        if (Math.random() > 0.92) {
+          const pixelIdx = i / 4;
+          brightPixels.push({
+            x: (pixelIdx % W) / W,
+            y: Math.floor(pixelIdx / W) / H
+          });
+        }
+      }
+    }
+
+    actx.putImageData(imageData, 0, 0);
+    maskBitmap = await createImageBitmap(analyseCanvas);
+
+    // Si pas de pixels brillants trouvés, on génère des positions aléatoires
+    if (brightPixels.length === 0) {
+      for (let i = 0; i < 30; i++) {
+        brightPixels.push({ x: Math.random(), y: Math.random() * 0.75 });
+      }
+    }
+
+    startCardEffect();
+
+  } catch (err) {
+    console.warn('Analyse image échouée, effets simplifiés', err);
+    // Fallback : pixels aléatoires
+    brightPixels = Array.from({ length: 40 }, () => ({
+      x: Math.random(), y: Math.random() * 0.75
+    }));
+    maskBitmap = null;
+    startCardEffect();
+  }
+}
+
+// ═══════════════════════════════════════════════════════════
+//  EFFET LUMINEUX CARTE (pulse + masque screen blend)
+// ═══════════════════════════════════════════════════════════
+function startCardEffect() {
+  stopCardEffect();
+
+  const lightCanvas = document.getElementById('card-light-canvas');
+  const partCanvas  = document.getElementById('card-particles-canvas');
+  const card        = document.getElementById('hero-card');
+
+  // Sync dimensions
+  function syncDimensions() {
+    const w = card.offsetWidth;
+    const h = card.offsetHeight;
+    if (lightCanvas.width !== w || lightCanvas.height !== h) {
+      lightCanvas.width = w;  lightCanvas.height = h;
+      partCanvas.width  = w;  partCanvas.height  = h;
+    }
+  }
+  syncDimensions();
+
+  const lctx = lightCanvas.getContext('2d');
+  const pctx = partCanvas.getContext('2d');
+
+  // ── Classe Particule ──
+  class CardParticle {
+    constructor() { this.reset(true); }
+
+    reset(initial = false) {
+      const pw = partCanvas.width;
+      const ph = partCanvas.height;
+
+      if (brightPixels.length > 0) {
+        const pt = brightPixels[Math.floor(Math.random() * brightPixels.length)];
+        this.x = pt.x * pw + (Math.random() - 0.5) * 24;
+        this.y = pt.y * ph + (Math.random() - 0.5) * 24;
+      } else {
+        this.x = Math.random() * pw;
+        this.y = Math.random() * ph;
+      }
+
+      this.size   = Math.random() * 2.2 + 0.6;
+      this.speedX = (Math.random() - 0.5) * 0.9;
+      this.speedY = -(Math.random() * 1.2 + 0.4);
+      this.life   = initial ? Math.random() : 1.0;
+      this.decay  = Math.random() * 0.016 + 0.005;
+      this.color  = PARTICLE_COLORS[Math.floor(Math.random() * PARTICLE_COLORS.length)];
+    }
+
+    update() {
+      this.x += this.speedX;
+      this.y += this.speedY;
+      this.life -= this.decay;
+      if (this.life <= 0) this.reset();
+    }
+
+    draw() {
+      pctx.beginPath();
+      pctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+      pctx.fillStyle = `rgba(${this.color},${Math.max(0, this.life) * 0.85})`;
+      pctx.fill();
+    }
+  }
+
+  const particles = Array.from({ length: 55 }, () => new CardParticle());
+
+  // ── Boucle d'animation ──
+  function animate() {
+    syncDimensions();
+    const w = lightCanvas.width;
+    const h = lightCanvas.height;
+
+    const time  = performance.now() / 1000;
+    const pulse = (Math.sin(time * 2.5) + 1) / 2; // 0 → 1
+
+    // === Canvas particules ===
+    pctx.clearRect(0, 0, w, h);
+    pctx.save();
+    pctx.shadowBlur = 6 * pulse;
+    pctx.shadowColor = 'rgba(255,255,255,0.8)';
+    for (const p of particles) { p.update(); p.draw(); }
+    pctx.restore();
+
+    // === Canvas lumineux (screen blend) ===
+    lctx.clearRect(0, 0, w, h);
+    if (maskBitmap) {
+      lctx.save();
+      lctx.globalAlpha = 0.12 + pulse * 0.55; // pulsation
+      lctx.shadowBlur  = 28 * pulse;
+      lctx.shadowColor = 'white';
+      lctx.drawImage(maskBitmap, 0, 0, w, h);
+      lctx.restore();
+    } else {
+      // Fallback : halo central simple
+      lctx.save();
+      lctx.globalAlpha = 0.08 + pulse * 0.18;
+      const grad = lctx.createRadialGradient(w * 0.5, h * 0.35, 0, w * 0.5, h * 0.35, w * 0.45);
+      grad.addColorStop(0, 'rgba(255,255,255,0.6)');
+      grad.addColorStop(1, 'rgba(255,255,255,0)');
+      lctx.fillStyle = grad;
+      lctx.fillRect(0, 0, w, h);
+      lctx.restore();
+    }
+
+    cardEffectRAF = requestAnimationFrame(animate);
+  }
+
+  lightCanvas.classList.add('ready');
+  animate();
+}
+
+function stopCardEffect() {
+  if (cardEffectRAF) { cancelAnimationFrame(cardEffectRAF); cardEffectRAF = null; }
+  const lc = document.getElementById('card-light-canvas');
+  const pc = document.getElementById('card-particles-canvas');
+  if (lc) { const ctx = lc.getContext('2d'); ctx.clearRect(0, 0, lc.width, lc.height); lc.classList.remove('ready'); }
+  if (pc) { const ctx = pc.getContext('2d'); ctx.clearRect(0, 0, pc.width, pc.height); }
+}
+
+// ═══════════════════════════════════════════════════════════
+//  PARTICULES DE FOND (zone gauche)
+// ═══════════════════════════════════════════════════════════
+function startBgParticles() {
+  stopBgParticles();
+
+  const canvas    = document.getElementById('particles-canvas');
+  const container = canvas.parentElement;
+
+  function resize() {
+    canvas.width  = container.offsetWidth;
+    canvas.height = container.offsetHeight;
+  }
+  resize();
+  window.addEventListener('resize', resize);
+
+  const ctx = canvas.getContext('2d');
+  const N   = 40;
+
+  const bgParticles = Array.from({ length: N }, () => ({
+    x:       Math.random() * canvas.width,
+    y:       Math.random() * canvas.height,
+    r:       Math.random() * 2.2 + 0.5,
+    vx:      (Math.random() - 0.5) * 0.35,
+    vy:      (Math.random() - 0.55) * 0.45,
+    opacity: Math.random() * 0.4 + 0.08,
+    color:   Math.random() > 0.6 ? '246,161,25' : '66,133,244'
+  }));
+
+  function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    for (const p of bgParticles) {
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(${p.color},${p.opacity})`;
+      ctx.fill();
+
+      p.x += p.vx; p.y += p.vy;
+      if (p.x < 0 || p.x > canvas.width)  p.vx *= -1;
+      if (p.y < 0 || p.y > canvas.height) p.vy *= -1;
+      p.opacity += (Math.random() - 0.5) * 0.012;
+      p.opacity = Math.max(0.04, Math.min(0.55, p.opacity));
+    }
+    bgParticlesRAF = requestAnimationFrame(draw);
+  }
+  draw();
+}
+
+function stopBgParticles() {
+  if (bgParticlesRAF) { cancelAnimationFrame(bgParticlesRAF); bgParticlesRAF = null; }
+}
+
+// ═══════════════════════════════════════════════════════════
+//  TILT 3D CARTE
+// ═══════════════════════════════════════════════════════════
+function initCardTilt() {
+  const wrapper = document.getElementById('card-tilt-wrapper');
+  const card    = document.getElementById('hero-card');
+  const shine   = document.getElementById('card-shine');
+
+  let targetRX = 0, targetRY = 0, currentRX = 0, currentRY = 0;
+  let tiltRAF = null;
+
+  function lerp(a, b, t) { return a + (b - a) * t; }
+
+  function animateTilt() {
+    currentRX = lerp(currentRX, targetRX, 0.1);
+    currentRY = lerp(currentRY, targetRY, 0.1);
+    card.style.transform = `rotateX(${currentRX}deg) rotateY(${currentRY}deg) scale(1.02)`;
+    tiltRAF = requestAnimationFrame(animateTilt);
+  }
+  if (tiltRAF) cancelAnimationFrame(tiltRAF);
+  animateTilt();
+
+  wrapper.addEventListener('mousemove', (e) => {
+    const rect = wrapper.getBoundingClientRect();
+    const cx   = rect.left + rect.width  / 2;
+    const cy   = rect.top  + rect.height / 2;
+    targetRY   =  ((e.clientX - cx) / (rect.width  / 2)) * 8;
+    targetRX   = -((e.clientY - cy) / (rect.height / 2)) * 8;
+    const mx = ((e.clientX - rect.left) / rect.width  * 100).toFixed(1);
+    const my = ((e.clientY - rect.top)  / rect.height * 100).toFixed(1);
+    shine.style.setProperty('--mx', mx + '%');
+    shine.style.setProperty('--my', my + '%');
+  });
+
+  wrapper.addEventListener('mouseleave', () => {
+    targetRX = 0; targetRY = 0;
+    card.style.boxShadow = '0 20px 60px rgba(38,47,99,0.35), 0 4px 16px rgba(38,47,99,0.15)';
+  });
+
+  wrapper.addEventListener('mouseenter', () => {
+    card.style.boxShadow = '0 28px 70px rgba(38,47,99,0.45), 0 8px 24px rgba(66,133,244,0.15)';
+  });
+}
+
+// ═══════════════════════════════════════════════════════════
+//  NETTOYAGE (si le parent détruit l'iframe)
+// ═══════════════════════════════════════════════════════════
+window.addEventListener('beforeunload', () => {
+  stopCardEffect();
+  stopBgParticles();
+});
+</script>
+</body>
+</html>
