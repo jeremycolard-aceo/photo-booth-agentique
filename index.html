@@ -182,14 +182,14 @@ body::before {
 }
 .arch-panel:last-child { border-right: none; }
 
-.arch-panel img {
+.arch-panel video {
   width: 100%; height: 100%;
-  object-fit: cover; object-position: center top;
-  display: block;
+  object-fit: cover; object-position: center top; display: block;
   filter: grayscale(0.8) brightness(0.8) contrast(1.1);
   transition: filter 0.5s ease, transform 0.7s ease;
   transform: scale(1.05);
 }
+.arch-panel:hover video { filter: grayscale(0) brightness(1) contrast(1.05); transform: scale(1); }
 
 .arch-panel::after {
   content: '';
@@ -219,7 +219,6 @@ body::before {
   transform: translateY(10px);
   transition: opacity 0.4s ease, transform 0.4s ease;
 }
-.arch-panel:hover img         { filter: grayscale(0) brightness(1) contrast(1.05); transform: scale(1); }
 .arch-panel:hover::after      { opacity: 1; }
 .arch-panel:hover .arch-label { opacity: 1; transform: translateY(0); }
 
@@ -806,38 +805,48 @@ canvas { display: none; }
   <div class="screen active" id="screen-choose">
     <div class="choose-title">Choisissez votre <em>avatar</em></div>
     <div class="arch-grid">
-      <div class="arch-panel" data-arch="security-sentinel" onclick="onArchClick(this)">
-        <img src="./Security Sentinel.png" alt="Security Sentinel" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 400 600%22><rect fill=%22%23F4F5F5%22 width=%22400%22 height=%22600%22/><text x=%22200%22 y=%22300%22 text-anchor=%22middle%22 fill=%22%23262F63%22 font-size=%2272%22>🛡️</text></svg>'">
-        <div class="arch-panel-glow"></div>
-        <div class="arch-tag">SENTINEL</div>
-        <div class="arch-label">Security Sentinel</div>
-      </div>
-      <div class="arch-panel" data-arch="ai-sorcerer" onclick="onArchClick(this)">
-        <img src="./AI Sorcerer.png" alt="AI Sorcerer" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 400 600%22><rect fill=%22%23F4F5F5%22 width=%22400%22 height=%22600%22/><text x=%22200%22 y=%22300%22 text-anchor=%22middle%22 fill=%22%23262F63%22 font-size=%2272%22>🧙</text></svg>'">
-        <div class="arch-panel-glow"></div>
-        <div class="arch-tag">SORCIER</div>
-        <div class="arch-label">AI Sorcerer</div>
-      </div>
-      <div class="arch-panel" data-arch="cloud-architect" onclick="onArchClick(this)">
-        <img src="./Cloud Architect.png" alt="Cloud Architect" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 400 600%22><rect fill=%22%23F4F5F5%22 width=%22400%22 height=%22600%22/><text x=%22200%22 y=%22300%22 text-anchor=%22middle%22 fill=%22%23262F63%22 font-size=%2272%22>🏗️</text></svg>'">
-        <div class="arch-panel-glow"></div>
-        <div class="arch-tag">ARCHITECTE</div>
-        <div class="arch-label">Cloud Architect</div>
-      </div>
-      <div class="arch-panel" data-arch="data-wrangler" onclick="onArchClick(this)">
-        <img src="./Data Wrangler.png" alt="Data Wrangler" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 400 600%22><rect fill=%22%23F4F5F5%22 width=%22400%22 height=%22600%22/><text x=%22200%22 y=%22300%22 text-anchor=%22middle%22 fill=%22%23262F63%22 font-size=%2272%22>🗄️</text></svg>'">
-        <div class="arch-panel-glow"></div>
-        <div class="arch-tag">WRANGLER</div>
-        <div class="arch-label">Data Wrangler</div>
-      </div>
-    </div>
+  <div class="arch-panel" data-arch="security-sentinel" onclick="onArchClick(this)"
+       onmouseenter="playArchVideo(this)" onmouseleave="pauseArchVideo(this)">
+    <video src="https://res.cloudinary.com/dayss50y9/video/upload/v1779697682/SENTINELLE_flwkop.mp4"
+           muted playsinline loop preload="metadata"></video>
+    <div class="arch-panel-glow"></div>
+    <div class="arch-tag">SENTINEL</div>
+    <div class="arch-label">Security Sentinel</div>
+  </div>
+  <div class="arch-panel" data-arch="ai-sorcerer" onclick="onArchClick(this)"
+       onmouseenter="playArchVideo(this)" onmouseleave="pauseArchVideo(this)">
+    <video src="https://res.cloudinary.com/dayss50y9/video/upload/v1779697681/de_m%C3%AAme_avec_cette_image_a8uegn.mp4"
+           muted playsinline loop preload="metadata"></video>
+    <div class="arch-panel-glow"></div>
+    <div class="arch-tag">SORCIER</div>
+    <div class="arch-label">AI Sorcerer</div>
+  </div>
+  <div class="arch-panel" data-arch="cloud-architect" onclick="onArchClick(this)"
+       onmouseenter="playArchVideo(this)" onmouseleave="pauseArchVideo(this)">
+    <video src="https://res.cloudinary.com/dayss50y9/video/upload/v1779697141/CLOUDARCHITECT_q22kix.mp4"
+           muted playsinline loop preload="metadata"></video>
+    <div class="arch-panel-glow"></div>
+    <div class="arch-tag">ARCHITECTE</div>
+    <div class="arch-label">Cloud Architect</div>
+  </div>
+  <div class="arch-panel" data-arch="data-wrangler" onclick="onArchClick(this)"
+       onmouseenter="playArchVideo(this)" onmouseleave="pauseArchVideo(this)">
+    <video src="https://res.cloudinary.com/dayss50y9/video/upload/v1779697141/DATAWRANGLER_jvhosa.mp4"
+           muted playsinline loop preload="metadata"></video>
+    <div class="arch-panel-glow"></div>
+    <div class="arch-tag">WRANGLER</div>
+    <div class="arch-label">Data Wrangler</div>
+  </div>
+</div>
   </div>
 
   <div class="screen" id="screen-capture">
     <div class="cap-left">
-      <img class="cap-arch-img" id="cap-arch-img" src="" alt="">
-      <div class="cap-arch-label" id="cap-arch-label"></div>
-    </div>
+  <video class="cap-arch-img" id="cap-arch-video"
+         muted playsinline loop autoplay
+         style="width:100%;height:100%;object-fit:cover;object-position:center top;display:block;"></video>
+  <div class="cap-arch-label" id="cap-arch-label"></div>
+</div>
     <div class="cap-right">
       <div class="cam-wrapper" id="cam-wrapper">
         <video id="cam-video" autoplay playsinline muted></video>
@@ -978,7 +987,14 @@ function playSynthClick() {
     osc.start(); osc.stop(ctx.currentTime + 0.15);
   } catch(e) {}
 }
-
+function playArchVideo(panel) {
+  const v = panel.querySelector('video');
+  if (v) v.play().catch(() => {});
+}
+function pauseArchVideo(panel) {
+  const v = panel.querySelector('video');
+  if (v) { v.pause(); v.currentTime = 0; }
+}
 function playSynthShutter() {
   try {
     const ctx = getAudio();
@@ -1058,12 +1074,11 @@ function attachSounds() {
 //  ARCHETYPES
 // ════════════════════════════════════════
 const ARCHETYPES = {
-  'security-sentinel': { label: 'Security Sentinel', emoji: '🛡️', img: './Security Sentinel.png', scene: `Holding a luminous shield...` },
-  'ai-sorcerer':       { label: 'AI Sorcerer',       emoji: '🧙', img: './AI Sorcerer.png',       scene: `Surrounded by glowing orbs...` },
-  'cloud-architect':   { label: 'Cloud Architect',   emoji: '🏗️', img: './Cloud Architect.png',   scene: `Standing on floating platform...` },
-  'data-wrangler':     { label: 'Data Wrangler',     emoji: '🗄️', img: './Data Wrangler.png',     scene: `Flowing cape of data streams...` }
+  'security-sentinel': { label: 'Security Sentinel', emoji: '🛡️', videoSrc: 'https://res.cloudinary.com/dayss50y9/video/upload/v1779697682/SENTINELLE_flwkop.mp4',             scene: `Holding a luminous shield...` },
+  'ai-sorcerer':       { label: 'AI Sorcerer',       emoji: '🧙', videoSrc: 'https://res.cloudinary.com/dayss50y9/video/upload/v1779697681/de_m%C3%AAme_avec_cette_image_a8uegn.mp4', scene: `Surrounded by glowing orbs...` },
+  'cloud-architect':   { label: 'Cloud Architect',   emoji: '🏗️', videoSrc: 'https://res.cloudinary.com/dayss50y9/video/upload/v1779697141/CLOUDARCHITECT_q22kix.mp4',          scene: `Standing on floating platform...` },
+  'data-wrangler':     { label: 'Data Wrangler',     emoji: '🗄️', videoSrc: 'https://res.cloudinary.com/dayss50y9/video/upload/v1779697141/DATAWRANGLER_jvhosa.mp4',             scene: `Flowing cape of data streams...` }
 };
-
 function buildPrompt(key) {
   const a = ARCHETYPES[key];
   return `A heroic stylized 3D illustration portrait based on the reference photo... Setting: ${a.scene}`;
@@ -1156,7 +1171,9 @@ function submitForm() {
 // ════════════════════════════════════════
 async function goCapture() {
   const arch = ARCHETYPES[selectedArch];
-  document.getElementById('cap-arch-img').src = arch.img;
+  const capVideo = document.getElementById('cap-arch-video');
+capVideo.src = arch.videoSrc;
+capVideo.play().catch(() => {});
   document.getElementById('cap-arch-label').textContent = arch.label;
   document.getElementById('cap-username').textContent = userName;
   showScreen('screen-capture'); await initCam();
