@@ -98,7 +98,7 @@ body::before {
   background: var(--blanc);
 }
 .logo-aceo {
-  height: 95px; /* ACEO logo beaucoup plus grand */
+  height: 95px;
   opacity: 1;
 }
 .header-tag {
@@ -182,14 +182,13 @@ body::before {
 }
 .arch-panel:last-child { border-right: none; }
 
-.arch-panel img {
+.arch-panel video {
   width: 100%; height: 100%;
-  object-fit: cover; object-position: center top;
-  display: block;
+  object-fit: cover; object-position: center top; display: block;
   filter: grayscale(0.8) brightness(0.8) contrast(1.1);
-  transition: filter 0.5s ease, transform 0.7s ease;
-  transform: scale(1.05);
+  transition: filter 0.5s ease;
 }
+.arch-panel:hover video { filter: grayscale(0) brightness(1) contrast(1.05); }
 
 .arch-panel::after {
   content: '';
@@ -219,7 +218,6 @@ body::before {
   transform: translateY(10px);
   transition: opacity 0.4s ease, transform 0.4s ease;
 }
-.arch-panel:hover img         { filter: grayscale(0) brightness(1) contrast(1.05); transform: scale(1); }
 .arch-panel:hover::after      { opacity: 1; }
 .arch-panel:hover .arch-label { opacity: 1; transform: translateY(0); }
 
@@ -440,7 +438,6 @@ canvas { display: none; }
 }
 #gen-overlay.show { display: flex; }
 
-/* Animation Fusée ACEO */
 .gen-rocket {
   width: 100px;
   height: auto;
@@ -459,17 +456,28 @@ canvas { display: none; }
 #gen-white-flash.flash-in  { opacity: 1; transition: opacity 0.12s ease; }
 #gen-white-flash.flash-out { opacity: 0; transition: opacity 0.8s ease; }
 
+/* ══════════════════════════════════
+   REVEAL CINÉMATIQUE — avec effet lumineux
+══════════════════════════════════ */
 #gen-result-reveal {
   display: none; position: fixed; inset: 0; z-index: 202;
   background: var(--bleu-nuit);
   flex-direction: column; align-items: center; justify-content: center;
 }
 #gen-result-reveal.show { display: flex; }
+
+/* Wrapper position relative pour superposer canvas de particules */
+#reveal-img-wrapper {
+  position: relative;
+  display: flex; align-items: center; justify-content: center;
+}
 #gen-result-reveal img {
-  max-height: 90vh; max-width: 90vw; object-fit: contain;
+  max-height: 75vh; max-width: 80vw; object-fit: contain;
   border-radius: 4px; border: 2px solid var(--blanc);
   box-shadow: 0 0 50px rgba(0,0,0,0.5);
   opacity: 0; transform: scale(0.9);
+  display: block;
+  position: relative; z-index: 1;
 }
 #gen-result-reveal img.reveal-anim { animation: big-reveal 1.2s cubic-bezier(0.22,1,0.36,1) forwards; }
 @keyframes big-reveal {
@@ -478,13 +486,32 @@ canvas { display: none; }
   to   { opacity: 1; transform: scale(1); filter: brightness(1) blur(0); }
 }
 
+/* Canvas de particules superposé au reveal */
+#reveal-particles-canvas {
+  position: absolute; inset: 0; z-index: 2;
+  pointer-events: none;
+  border-radius: 4px;
+}
+
+/* Canvas masque lumineux pour le reveal (pulsation) */
+#reveal-mask-canvas {
+  position: absolute; inset: 0; z-index: 3;
+  pointer-events: none;
+  border-radius: 4px;
+  opacity: 0;
+  mix-blend-mode: screen;
+  transition: opacity 0.6s ease;
+}
+#reveal-mask-canvas.active { opacity: 1; }
+
 #gen-result-cta {
-  margin-top: 32px; font-family: 'Black Ops One', cursive;
+  margin-top: 28px; font-family: 'Black Ops One', cursive;
   font-size: 20px; text-transform: uppercase;
   color: var(--blanc); cursor: pointer;
   border: 2px solid var(--bleu-google);
   padding: 16px 40px; border-radius: 4px;
   background: var(--bleu-google); transition: all 0.2s;
+  position: relative; z-index: 10;
 }
 #gen-result-cta:hover { background: #3371db; transform: translateY(-2px); }
 
@@ -512,35 +539,158 @@ canvas { display: none; }
 /* ══════════════════════════════════
    ÉCRAN C — RÉSULTAT
 ══════════════════════════════════ */
-#screen-result { flex-direction: row; }
+#screen-result { flex-direction: row; overflow: hidden; }
 
+/* ── ZONE GAUCHE : canvas particules + carte ── */
 .result-left {
-  flex: 1.1; display: flex; align-items: center; justify-content: center;
+  flex: 1.1;
+  position: relative;
+  display: flex; align-items: center; justify-content: center;
   padding: 28px 20px 28px 44px;
-}
-.result-img-wrap {
-  position: relative; width: 100%; max-width: 480px; aspect-ratio: 3/4;
-  border-radius: 8px; overflow: hidden;
-  box-shadow: 0 15px 40px rgba(38, 47, 99, 0.2);
-  animation: result-reveal 0.8s cubic-bezier(0.22,1,0.36,1);
-}
-@keyframes result-reveal { from{opacity:0;transform:scale(0.91)} to{opacity:1;transform:scale(1)} }
-.result-img-wrap img { width:100%; height:100%; object-fit:cover; display:block; }
-.result-logo {
-  position: absolute; bottom: 20px; right: 20px;
-  height: 45px; opacity: 1; /* Logo ACEO visible sur la carte */
+  overflow: hidden;
 }
 
+/* Canvas particules en fond de la zone gauche */
+#particles-canvas {
+  position: absolute; inset: 0; z-index: 0;
+  pointer-events: none;
+}
+
+/* Wrapper de la carte avec perspective pour le tilt */
+.card-tilt-wrapper {
+  position: relative; z-index: 1;
+  width: 100%; max-width: 420px;
+  perspective: 900px;
+  cursor: default;
+}
+
+/* ── TRADING CARD STYLISÉE ── */
+.hero-card {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 3/4;
+  border-radius: 16px;
+  overflow: hidden;
+  transform-style: preserve-3d;
+  transition: transform 0.12s ease-out, box-shadow 0.12s ease-out;
+  box-shadow:
+    0 20px 60px rgba(38, 47, 99, 0.35),
+    0 4px 16px rgba(38, 47, 99, 0.15);
+  will-change: transform;
+}
+
+/* Photo générée prend toute la carte */
+.hero-card .card-photo {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  object-fit: cover; display: block;
+}
+
+/* Canvas masque de pulsation lumineuse sur la carte */
+#card-pulse-canvas {
+  position: absolute; inset: 0; z-index: 2;
+  pointer-events: none;
+  border-radius: 16px;
+  mix-blend-mode: screen;
+}
+
+/* Canvas de particules sur la carte (dessus du masque) */
+#card-particles-overlay {
+  position: absolute; inset: 0; z-index: 3;
+  pointer-events: none;
+  border-radius: 16px;
+}
+
+/* Reflet holographique qui suit la souris */
+.hero-card .card-shine {
+  position: absolute; inset: 0; z-index: 4;
+  background: radial-gradient(
+    circle at var(--mx, 50%) var(--my, 50%),
+    rgba(255,255,255,0.18) 0%,
+    rgba(255,255,255,0.06) 30%,
+    transparent 65%
+  );
+  border-radius: 16px;
+  pointer-events: none;
+  transition: background 0.08s;
+  mix-blend-mode: screen;
+}
+
+/* Overlay dégradé bas de carte */
+.hero-card .card-overlay {
+  position: absolute; inset: 0; z-index: 5;
+  background: linear-gradient(
+    to bottom,
+    transparent 45%,
+    rgba(38, 47, 99, 0.55) 70%,
+    rgba(38, 47, 99, 0.92) 100%
+  );
+}
+
+/* Contenu texte de la carte */
+.hero-card .card-content {
+  position: absolute; bottom: 0; left: 0; right: 0; z-index: 6;
+  padding: 20px 22px 22px;
+}
+
+/* Badge archétype */
+.hero-card .card-badge {
+  display: inline-block;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase;
+  padding: 5px 12px;
+  background: var(--bleu-google);
+  color: var(--blanc);
+  border-radius: 3px;
+  margin-bottom: 8px;
+}
+
+/* Nom sur la carte */
+.hero-card .card-name {
+  font-family: 'Black Ops One', cursive;
+  font-size: clamp(22px, 2.8vw, 36px);
+  color: var(--blanc);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  line-height: 1;
+  text-shadow: 0 2px 8px rgba(0,0,0,0.6);
+}
+
+/* Sous-titre archétype */
+.hero-card .card-arch {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 13px; letter-spacing: 0.1em;
+  color: rgba(255,255,255,0.7);
+  text-transform: uppercase;
+  margin-top: 4px;
+}
+
+/* Logo ACEO en bas à droite de la carte */
+.hero-card .card-logo {
+  position: absolute; bottom: 18px; right: 18px; z-index: 7;
+  height: 36px; opacity: 0.95;
+}
+
+/* Bordure brillante de la carte */
+.hero-card::before {
+  content: '';
+  position: absolute; inset: 0; z-index: 8;
+  border-radius: 16px;
+  border: 1.5px solid rgba(255,255,255,0.25);
+  pointer-events: none;
+}
+
+/* ── ZONE DROITE — actions + leaderboard ── */
 .result-right {
   flex: 1; display: flex; flex-direction: column; justify-content: center;
-  padding: 32px 44px 32px 28px; gap: 18px;
+  padding: 32px 44px 32px 28px; gap: 16px;
 }
 .result-eyebrow {
   font-family: 'Share Tech Mono', monospace; font-size: 14px;
   font-weight: bold; text-transform: uppercase; color: var(--bleu-canard);
 }
 .result-title {
-  font-family: 'Black Ops One', cursive; font-size: clamp(36px, 4.5vw, 62px);
+  font-family: 'Black Ops One', cursive; font-size: clamp(32px, 4vw, 56px);
   color: var(--bleu-nuit); text-transform: uppercase; line-height: 1;
 }
 .result-title em { font-style: normal; color: var(--bleu-google); display: block; }
@@ -552,27 +702,111 @@ canvas { display: none; }
   color: var(--bleu-nuit); font-weight: bold; text-transform: uppercase; width: fit-content;
 }
 
-.result-actions { display: flex; flex-direction: column; gap: 12px; margin-top: 10px; }
+.result-actions { display: flex; flex-direction: column; gap: 10px; }
 .btn-action {
-  padding: 18px 24px; border-radius: 4px; font-family: 'Black Ops One', cursive;
-  font-size: 16px; text-transform: uppercase; cursor: pointer; border: none;
+  padding: 16px 24px; border-radius: 4px; font-family: 'Black Ops One', cursive;
+  font-size: 15px; text-transform: uppercase; cursor: pointer; border: none;
   transition: all 0.2s; text-align: left;
 }
 .btn-action-primary { background: var(--bleu-google); color: var(--blanc); }
 .btn-action-primary:hover { background: #3371db; transform: translateX(4px); }
 .btn-action-ghost {
   background: var(--blanc-casse); color: var(--bleu-canard);
-  font-family: 'Rajdhani', sans-serif; font-size: 16px; font-weight: 700;
+  font-family: 'Rajdhani', sans-serif; font-size: 15px; font-weight: 700;
 }
 .btn-action-ghost:hover { background: #e2e4e9; color: var(--bleu-nuit); transform: translateX(4px); }
 
 .result-status {
-  font-family: 'Share Tech Mono', monospace; font-size: 14px; padding: 12px 16px;
+  font-family: 'Share Tech Mono', monospace; font-size: 13px; padding: 10px 14px;
   border-radius: 4px; display: none; font-weight: bold;
 }
 .result-status.info    { display:block; background:#e8f0fe; color:var(--bleu-google); border-left:4px solid var(--bleu-google); }
 .result-status.success { display:block; background:#e6f4ea; color:#137333; border-left:4px solid #137333; }
 .result-status.error   { display:block; background:#fce8e6; color:#c5221f; border-left:4px solid #c5221f; }
+
+/* ══════════════════════════════════
+   LEADERBOARD
+══════════════════════════════════ */
+.leaderboard {
+  background: var(--blanc-casse);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 16px 20px;
+  flex-shrink: 0;
+}
+.leaderboard-title {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 11px; font-weight: bold;
+  letter-spacing: 0.15em; text-transform: uppercase;
+  color: var(--bleu-canard);
+  margin-bottom: 12px;
+  display: flex; align-items: center; gap: 8px;
+}
+.leaderboard-title::after {
+  content: '';
+  flex: 1; height: 1px;
+  background: var(--border);
+}
+
+.lb-row {
+  display: flex; align-items: center; gap: 10px;
+  margin-bottom: 8px;
+}
+.lb-row:last-child { margin-bottom: 0; }
+
+.lb-rank {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 11px; color: rgba(38,47,99,0.4);
+  width: 18px; text-align: center; flex-shrink: 0;
+}
+.lb-rank.gold   { color: #e8a020; font-weight: bold; }
+.lb-rank.silver { color: #888; font-weight: bold; }
+.lb-rank.bronze { color: #b06020; font-weight: bold; }
+
+.lb-label {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 12px; text-transform: uppercase;
+  letter-spacing: 0.06em; color: var(--bleu-nuit);
+  flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.lb-label.active-arch {
+  color: var(--bleu-google);
+}
+
+.lb-bar-wrap {
+  flex: 2; height: 6px; background: rgba(38,47,99,0.08);
+  border-radius: 3px; overflow: hidden;
+}
+.lb-bar {
+  height: 100%; border-radius: 3px;
+  background: linear-gradient(90deg, var(--bleu-google), #74a8ff);
+  transition: width 1.2s cubic-bezier(0.22,1,0.36,1);
+  width: 0%;
+}
+.lb-bar.active-bar {
+  background: linear-gradient(90deg, var(--orange-ambre), #fbd07a);
+}
+
+.lb-count {
+  font-family: 'Black Ops One', cursive;
+  font-size: 15px; color: var(--bleu-nuit);
+  min-width: 28px; text-align: right; flex-shrink: 0;
+}
+.lb-count.active-count { color: var(--bleu-google); }
+
+.lb-total {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 11px; color: rgba(38,47,99,0.45);
+  text-align: right; margin-top: 10px;
+  border-top: 1px solid var(--border); padding-top: 8px;
+}
+
+.lb-loading {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 12px; color: var(--bleu-canard);
+  text-align: center; padding: 8px 0;
+  animation: sub-blink 1.6s ease-in-out infinite;
+}
 </style>
 </head>
 <body>
@@ -587,7 +821,11 @@ canvas { display: none; }
 </div>
 
 <div id="gen-result-reveal">
-  <img id="reveal-img" src="" alt="Avatar révélé">
+  <div id="reveal-img-wrapper">
+    <img id="reveal-img" src="" alt="Avatar révélé">
+    <canvas id="reveal-particles-canvas"></canvas>
+    <canvas id="reveal-mask-canvas"></canvas>
+  </div>
   <button id="gen-result-cta" onclick="confirmReveal()">Voir mon profil →</button>
 </div>
 
@@ -615,38 +853,48 @@ canvas { display: none; }
   <div class="screen active" id="screen-choose">
     <div class="choose-title">Choisissez votre <em>avatar</em></div>
     <div class="arch-grid">
-      <div class="arch-panel" data-arch="security-sentinel" onclick="onArchClick(this)">
-        <img src="./Security Sentinel.png" alt="Security Sentinel" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 400 600%22><rect fill=%22%23F4F5F5%22 width=%22400%22 height=%22600%22/><text x=%22200%22 y=%22300%22 text-anchor=%22middle%22 fill=%22%23262F63%22 font-size=%2272%22>🛡️</text></svg>'">
-        <div class="arch-panel-glow"></div>
-        <div class="arch-tag">SENTINEL</div>
-        <div class="arch-label">Security Sentinel</div>
-      </div>
-      <div class="arch-panel" data-arch="ai-sorcerer" onclick="onArchClick(this)">
-        <img src="./AI Sorcerer.png" alt="AI Sorcerer" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 400 600%22><rect fill=%22%23F4F5F5%22 width=%22400%22 height=%22600%22/><text x=%22200%22 y=%22300%22 text-anchor=%22middle%22 fill=%22%23262F63%22 font-size=%2272%22>🧙</text></svg>'">
-        <div class="arch-panel-glow"></div>
-        <div class="arch-tag">SORCIER</div>
-        <div class="arch-label">AI Sorcerer</div>
-      </div>
-      <div class="arch-panel" data-arch="cloud-architect" onclick="onArchClick(this)">
-        <img src="./Cloud Architect.png" alt="Cloud Architect" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 400 600%22><rect fill=%22%23F4F5F5%22 width=%22400%22 height=%22600%22/><text x=%22200%22 y=%22300%22 text-anchor=%22middle%22 fill=%22%23262F63%22 font-size=%2272%22>🏗️</text></svg>'">
-        <div class="arch-panel-glow"></div>
-        <div class="arch-tag">ARCHITECTE</div>
-        <div class="arch-label">Cloud Architect</div>
-      </div>
-      <div class="arch-panel" data-arch="data-wrangler" onclick="onArchClick(this)">
-        <img src="./Data Wrangler.png" alt="Data Wrangler" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 400 600%22><rect fill=%22%23F4F5F5%22 width=%22400%22 height=%22600%22/><text x=%22200%22 y=%22300%22 text-anchor=%22middle%22 fill=%22%23262F63%22 font-size=%2272%22>🗄️</text></svg>'">
-        <div class="arch-panel-glow"></div>
-        <div class="arch-tag">WRANGLER</div>
-        <div class="arch-label">Data Wrangler</div>
-      </div>
-    </div>
+  <div class="arch-panel" data-arch="security-sentinel" onclick="onArchClick(this)"
+       onmouseenter="playArchVideo(this)" onmouseleave="pauseArchVideo(this)">
+    <video src="https://res.cloudinary.com/dayss50y9/video/upload/v1779697682/SENTINELLE_flwkop.mp4"
+           muted playsinline loop preload="metadata"></video>
+    <div class="arch-panel-glow"></div>
+    <div class="arch-tag">SENTINEL</div>
+    <div class="arch-label">Security Sentinel</div>
+  </div>
+  <div class="arch-panel" data-arch="ai-sorcerer" onclick="onArchClick(this)"
+       onmouseenter="playArchVideo(this)" onmouseleave="pauseArchVideo(this)">
+    <video src="https://res.cloudinary.com/dayss50y9/video/upload/v1779697681/de_m%C3%AAme_avec_cette_image_a8uegn.mp4"
+           muted playsinline loop preload="metadata"></video>
+    <div class="arch-panel-glow"></div>
+    <div class="arch-tag">SORCIER</div>
+    <div class="arch-label">AI Sorcerer</div>
+  </div>
+  <div class="arch-panel" data-arch="cloud-architect" onclick="onArchClick(this)"
+       onmouseenter="playArchVideo(this)" onmouseleave="pauseArchVideo(this)">
+    <video src="https://res.cloudinary.com/dayss50y9/video/upload/v1779697141/CLOUDARCHITECT_q22kix.mp4"
+           muted playsinline loop preload="metadata"></video>
+    <div class="arch-panel-glow"></div>
+    <div class="arch-tag">ARCHITECTE</div>
+    <div class="arch-label">Cloud Architect</div>
+  </div>
+  <div class="arch-panel" data-arch="data-wrangler" onclick="onArchClick(this)"
+       onmouseenter="playArchVideo(this)" onmouseleave="pauseArchVideo(this)">
+    <video src="https://res.cloudinary.com/dayss50y9/video/upload/v1779697141/DATAWRANGLER_jvhosa.mp4"
+           muted playsinline loop preload="metadata"></video>
+    <div class="arch-panel-glow"></div>
+    <div class="arch-tag">WRANGLER</div>
+    <div class="arch-label">Data Wrangler</div>
+  </div>
+</div>
   </div>
 
   <div class="screen" id="screen-capture">
     <div class="cap-left">
-      <img class="cap-arch-img" id="cap-arch-img" src="" alt="">
-      <div class="cap-arch-label" id="cap-arch-label"></div>
-    </div>
+  <video class="cap-arch-img" id="cap-arch-video"
+         muted playsinline loop autoplay
+         style="width:100%;height:100%;object-fit:cover;object-position:center top;display:block;"></video>
+  <div class="cap-arch-label" id="cap-arch-label"></div>
+</div>
     <div class="cap-right">
       <div class="cam-wrapper" id="cam-wrapper">
         <video id="cam-video" autoplay playsinline muted></video>
@@ -664,17 +912,37 @@ canvas { display: none; }
     </div>
   </div>
 
+  <!-- ── ÉCRAN RÉSULTAT ── -->
   <div class="screen" id="screen-result">
+
+    <!-- Zone gauche : particules + trading card tiltable -->
     <div class="result-left">
-      <div class="result-img-wrap" id="result-img-wrap">
-        <img id="result-img" src="" alt="Votre avatar">
-        <img class="result-logo" src="https://raw.githubusercontent.com/jeremycolard-aceo/photo-booth-agentique/main/logo-aceo.png" alt="ACEO" onerror="this.style.display='none'">
+      <canvas id="particles-canvas"></canvas>
+      <div class="card-tilt-wrapper" id="card-tilt-wrapper">
+        <div class="hero-card" id="hero-card">
+          <img class="card-photo" id="result-img" src="" alt="Votre avatar">
+          <!-- Canvas pulsation lumineuse sur la carte -->
+          <canvas id="card-pulse-canvas"></canvas>
+          <!-- Canvas particules sur la carte -->
+          <canvas id="card-particles-overlay"></canvas>
+          <div class="card-overlay"></div>
+          <div class="card-shine" id="card-shine"></div>
+          <div class="card-content">
+            <div class="card-badge" id="card-badge-arch">—</div>
+            <div class="card-name" id="card-name">Prénom</div>
+            <div class="card-arch" id="card-arch-sub">Archétype</div>
+          </div>
+          <img class="card-logo" src="https://raw.githubusercontent.com/jeremycolard-aceo/photo-booth-agentique/main/logo-aceo.png" alt="ACEO" onerror="this.style.display='none'">
+        </div>
       </div>
     </div>
+
+    <!-- Zone droite : infos + actions + leaderboard -->
     <div class="result-right">
       <div class="result-eyebrow">◆ Votre Google Cloud Hero ◆</div>
       <div class="result-title"><em id="res-name-em">Prénom</em>est prêt.</div>
       <div class="result-arch-badge" id="res-arch-badge">— Archétype —</div>
+
       <div class="result-actions">
         <button class="btn-action btn-action-primary" onclick="sendEmail()">
           Recevoir mon avatar par email →
@@ -687,7 +955,15 @@ canvas { display: none; }
         </button>
       </div>
       <div class="result-status" id="result-status"></div>
+
+      <!-- Leaderboard archétypes -->
+      <div class="leaderboard" id="leaderboard">
+        <div class="leaderboard-title">◆ Live au salon</div>
+        <div id="lb-content"><div class="lb-loading">Chargement des stats…</div></div>
+        <div class="lb-total" id="lb-total" style="display:none;"></div>
+      </div>
     </div>
+
   </div>
 </div>
 
@@ -696,7 +972,6 @@ canvas { display: none; }
     <button class="form-close" onclick="closeForm()">✕</button>
     <div class="form-card-title">Identify</div>
     <div class="form-card-sub">Archétype sélectionné : <strong id="form-arch-name">—</strong><br>Entrez vos données pour activer le protocole.</div>
-    
     <div class="field">
       <label>Prénom</label>
       <input type="text" id="f-nom" placeholder="Votre prénom" autocomplete="off" oninput="checkForm()">
@@ -705,12 +980,10 @@ canvas { display: none; }
       <label>Email</label>
       <input type="email" id="f-email" placeholder="vous@example.com" autocomplete="off" oninput="checkForm()">
     </div>
-    
     <div class="consent-row" onclick="toggleConsent()">
       <input type="checkbox" id="f-consent">
       <span>J'accepte que ma photo soit utilisée pour générer un avatar IA. L'image brute est supprimée immédiatement après génération. L'avatar est conservé 30 jours. Aucune donnée n'est utilisée pour entraîner un modèle.</span>
     </div>
-    
     <button class="btn-validate" id="btn-validate" disabled onclick="submitForm()">
       Activer le protocole →
     </button>
@@ -731,6 +1004,11 @@ const API_URL  = 'https://script.google.com/macros/s/AKfycbz8HfEmA9QsfGTiRvr6lfD
 const SECRET   = 'ton-uuid-secret';
 const LOGO_URL = 'https://raw.githubusercontent.com/jeremycolard-aceo/photo-booth-agentique/main/logo-aceo.png';
 const IDLE_TIMEOUT = 120;
+
+// Seuil de luminosité pour l'effet particules (75% de 255)
+const BRIGHTNESS_THRESHOLD = 191;
+// Couleurs des particules : bleu google et orange ambre ACEO
+const PARTICLE_COLORS = ['66,133,244', '246,161,25', '255,255,255'];
 
 // ════════════════════════════════════════
 //  AUDIO ENGINE
@@ -766,7 +1044,14 @@ function playSynthClick() {
     osc.start(); osc.stop(ctx.currentTime + 0.15);
   } catch(e) {}
 }
-
+function playArchVideo(panel) {
+  const v = panel.querySelector('video');
+  if (v) v.play().catch(() => {});
+}
+function pauseArchVideo(panel) {
+  const v = panel.querySelector('video');
+  if (v) v.pause();
+}
 function playSynthShutter() {
   try {
     const ctx = getAudio();
@@ -797,7 +1082,7 @@ function playSynthReveal() {
   } catch(e) {}
 }
 
-let ambientLoaded = false; let ambientPlaying = false; let ambientGain = null;
+let ambientPlaying = false;
 function startAmbient() {
   const el = document.getElementById('snd-ambient');
   el.src = './musique.mp3'; el.volume = 0;
@@ -813,20 +1098,20 @@ function startAmbient() {
 
 function startSynthAmbient() {
   try {
-    const ctx = getAudio(); ambientGain = ctx.createGain(); ambientGain.gain.value = 0;
-    ambientGain.connect(ctx.destination);
+    const ctx = getAudio(); const aGain = ctx.createGain(); aGain.gain.value = 0;
+    aGain.connect(ctx.destination);
     function makeLayer(freq, type, vol, vibRate) {
       const osc = ctx.createOscillator(); const lfo = ctx.createOscillator();
       const lfoGain = ctx.createGain(); lfo.frequency.value = vibRate;
       lfoGain.gain.value = freq * 0.003; lfo.connect(lfoGain); lfoGain.connect(osc.frequency);
       const g = ctx.createGain(); g.gain.value = vol;
       osc.type = type; osc.frequency.value = freq;
-      osc.connect(g); g.connect(ambientGain); osc.start(); lfo.start();
+      osc.connect(g); g.connect(aGain); osc.start(); lfo.start();
     }
     makeLayer(110, 'sine', 0.1, 0.13); makeLayer(165, 'triangle', 0.05, 0.23);
     let v = 0;
     const fad = setInterval(() => {
-      v = Math.min(v + 0.002, 0.08); ambientGain.gain.value = v;
+      v = Math.min(v + 0.002, 0.08); aGain.gain.value = v;
       if (v >= 0.08) clearInterval(fad);
     }, 80);
     ambientPlaying = true;
@@ -846,12 +1131,11 @@ function attachSounds() {
 //  ARCHETYPES
 // ════════════════════════════════════════
 const ARCHETYPES = {
-  'security-sentinel': { label: 'Security Sentinel', emoji: '🛡️', img: './Security Sentinel.png', scene: `Holding a luminous shield...` },
-  'ai-sorcerer':       { label: 'AI Sorcerer',       emoji: '🧙', img: './AI Sorcerer.png',       scene: `Surrounded by glowing orbs...` },
-  'cloud-architect':   { label: 'Cloud Architect',   emoji: '🏗️', img: './Cloud Architect.png',   scene: `Standing on floating platform...` },
-  'data-wrangler':     { label: 'Data Wrangler',     emoji: '🗄️', img: './Data Wrangler.png',     scene: `Flowing cape of data streams...` }
+  'security-sentinel': { label: 'Security Sentinel', emoji: '🛡️', videoSrc: 'https://res.cloudinary.com/dayss50y9/video/upload/v1779697682/SENTINELLE_flwkop.mp4',             scene: `Holding a luminous shield...` },
+  'ai-sorcerer':       { label: 'AI Sorcerer',       emoji: '🧙', videoSrc: 'https://res.cloudinary.com/dayss50y9/video/upload/v1779697681/de_m%C3%AAme_avec_cette_image_a8uegn.mp4', scene: `Surrounded by glowing orbs...` },
+  'cloud-architect':   { label: 'Cloud Architect',   emoji: '🏗️', videoSrc: 'https://res.cloudinary.com/dayss50y9/video/upload/v1779697141/CLOUDARCHITECT_q22kix.mp4',          scene: `Standing on floating platform...` },
+  'data-wrangler':     { label: 'Data Wrangler',     emoji: '🗄️', videoSrc: 'https://res.cloudinary.com/dayss50y9/video/upload/v1779697141/DATAWRANGLER_jvhosa.mp4',             scene: `Flowing cape of data streams...` }
 };
-
 function buildPrompt(key) {
   const a = ARCHETYPES[key];
   return `A heroic stylized 3D illustration portrait based on the reference photo... Setting: ${a.scene}`;
@@ -879,12 +1163,13 @@ function exitVideo() {
 }
 function goToSleep() {
   clearInterval(idleInterval); unbindIdleEvents(); resetAll(true);
+  stopAllParticleEffects();
   document.getElementById('app').classList.remove('visible');
   document.getElementById('screen-video').style.display = 'flex';
   document.getElementById('idle-video').play().catch(()=>{});
 }
 function goHome() {
-  playSynthClick(); resetAll(true);
+  playSynthClick(); resetAll(true); stopAllParticleEffects();
   document.getElementById('app').classList.remove('visible');
   document.getElementById('screen-video').style.display = 'flex';
   document.getElementById('idle-video').play().catch(()=>{});
@@ -943,7 +1228,9 @@ function submitForm() {
 // ════════════════════════════════════════
 async function goCapture() {
   const arch = ARCHETYPES[selectedArch];
-  document.getElementById('cap-arch-img').src = arch.img;
+  const capVideo = document.getElementById('cap-arch-video');
+  capVideo.src = arch.videoSrc;
+  capVideo.play().catch(() => {});
   document.getElementById('cap-arch-label').textContent = arch.label;
   document.getElementById('cap-username').textContent = userName;
   showScreen('screen-capture'); await initCam();
@@ -1035,10 +1322,206 @@ async function generateAvatar() {
   await cinemaReveal(resultImage);
 }
 
+// ════════════════════════════════════════
+//  EFFET LUMINEUX — CŒUR DE LA MAGIE
+//  Analyse l'image, trouve les zones > 75% de luminosité,
+//  génère un masque pulsant et des particules qui en émanent
+// ════════════════════════════════════════
+
+/**
+ * Analyse une image (src base64) et retourne la liste des pixels brillants
+ * @param {string} imgSrc - URL ou base64 de l'image
+ * @param {number} w - largeur cible pour l'analyse (réduit pour perf)
+ * @param {number} h - hauteur cible pour l'analyse
+ * @returns {Promise<{brightPixels: Array, maskCanvas: HTMLCanvasElement}>}
+ */
+async function buildLightMask(imgSrc, w, h) {
+  const img = await loadImg(imgSrc);
+  
+  // Canvas d'analyse (taille réduite pour perf)
+  const analyseCanvas = document.createElement('canvas');
+  analyseCanvas.width = w; analyseCanvas.height = h;
+  const analyseCtx = analyseCanvas.getContext('2d');
+  analyseCtx.drawImage(img, 0, 0, w, h);
+  
+  const imageData = analyseCtx.getImageData(0, 0, w, h);
+  const data = imageData.data;
+  const brightPixels = [];
+  
+  for (let i = 0; i < data.length; i += 4) {
+    const r = data[i], g = data[i+1], b = data[i+2];
+    // Luminosité perceptuelle (formule ITU-R BT.709)
+    const brightness = 0.2126 * r + 0.7152 * g + 0.0722 * b;
+    
+    if (brightness < BRIGHTNESS_THRESHOLD) {
+      data[i + 3] = 0; // zone sombre → transparent dans le masque
+    } else {
+      // 1 pixel sur 15 seulement pour ne pas surcharger
+      if (Math.random() > 0.93) {
+        const pixelIndex = i / 4;
+        brightPixels.push({
+          x: (pixelIndex % w) / w, // coordonnées normalisées 0-1
+          y: Math.floor(pixelIndex / w) / h
+        });
+      }
+    }
+  }
+  analyseCtx.putImageData(imageData, 0, 0);
+  
+  return { brightPixels, maskCanvas: analyseCanvas };
+}
+
+/**
+ * Crée et anime la pulsation lumineuse + particules sur un canvas cible
+ * @param {string} imgSrc         - image source
+ * @param {HTMLCanvasElement} pulseCanvas  - canvas pour la pulsation (mix-blend: screen)
+ * @param {HTMLCanvasElement} partCanvas   - canvas pour les particules
+ * @param {number} particleCount  - nombre de particules
+ * @returns {Function} stopFn - appeler pour arrêter l'animation
+ */
+async function startLightEffect(imgSrc, pulseCanvas, partCanvas, particleCount = 60) {
+  let running = true;
+  let raf = null;
+  
+  // Dimensions des canvas (prises du parent)
+  function syncSize() {
+    const parent = pulseCanvas.parentElement;
+    if (!parent) return;
+    const w = parent.offsetWidth;
+    const h = parent.offsetHeight;
+    if (pulseCanvas.width !== w || pulseCanvas.height !== h) {
+      pulseCanvas.width = w; pulseCanvas.height = h;
+      partCanvas.width = w; partCanvas.height = h;
+    }
+  }
+  syncSize();
+  
+  // Analyse de l'image à taille réduite (256x341 suffit)
+  const analysisW = 256;
+  const analysisH = Math.round(analysisW * (pulseCanvas.height / pulseCanvas.width || 1.33));
+  
+  let brightPixels = [];
+  let maskCanvas = null;
+  try {
+    const result = await buildLightMask(imgSrc, analysisW, analysisH);
+    brightPixels = result.brightPixels;
+    maskCanvas = result.maskCanvas;
+  } catch(e) {
+    // Si l'analyse échoue (CORS etc.), on utilise des positions aléatoires
+    for (let i = 0; i < 40; i++) {
+      brightPixels.push({ x: Math.random(), y: Math.random() * 0.7 });
+    }
+  }
+  
+  // ── Classe Particle ──
+  class Particle {
+    constructor() { this.reset(); }
+    reset() {
+      if (brightPixels.length > 0) {
+        const pt = brightPixels[Math.floor(Math.random() * brightPixels.length)];
+        this.x = pt.x * partCanvas.width + (Math.random() - 0.5) * 20;
+        this.y = pt.y * partCanvas.height + (Math.random() - 0.5) * 20;
+      } else {
+        this.x = Math.random() * partCanvas.width;
+        this.y = Math.random() * partCanvas.height;
+      }
+      this.size = Math.random() * 2.5 + 0.8;
+      this.speedX = (Math.random() - 0.5) * 1.2;
+      this.speedY = -(Math.random() * 1.5 + 0.3); // monte vers le haut
+      this.life = 1.0;
+      this.decay = Math.random() * 0.018 + 0.006;
+      this.color = PARTICLE_COLORS[Math.floor(Math.random() * PARTICLE_COLORS.length)];
+    }
+    update() {
+      this.x += this.speedX;
+      this.y += this.speedY;
+      this.life -= this.decay;
+      if (this.life <= 0) this.reset();
+    }
+    draw(ctx) {
+      ctx.beginPath();
+      ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(${this.color},${this.life * 0.85})`;
+      ctx.fill();
+    }
+  }
+  
+  // Initialise les particules
+  const particles = Array.from({ length: particleCount }, () => new Particle());
+  
+  // ── Boucle d'animation ──
+  function animate() {
+    if (!running) return;
+    syncSize();
+    
+    const W = pulseCanvas.width;
+    const H = pulseCanvas.height;
+    
+    // 1. Pulsation lumineuse (canvas pulse)
+    if (maskCanvas) {
+      const pulseCtx = pulseCanvas.getContext('2d');
+      pulseCtx.clearRect(0, 0, W, H);
+      
+      const t = performance.now() / 1000;
+      const pulse = (Math.sin(t * Math.PI * 0.8) + 1) / 2; // oscille entre 0 et 1
+      
+      pulseCtx.save();
+      pulseCtx.globalAlpha = 0.15 + pulse * 0.35;
+      // Filtre glow subtil via shadow
+      pulseCtx.shadowBlur = 12 + pulse * 18;
+      pulseCtx.shadowColor = 'rgba(66,133,244,0.8)';
+      pulseCtx.drawImage(maskCanvas, 0, 0, W, H);
+      pulseCtx.restore();
+    }
+    
+    // 2. Particules
+    const pCtx = partCanvas.getContext('2d');
+    pCtx.clearRect(0, 0, W, H);
+    for (const p of particles) {
+      p.update();
+      p.draw(pCtx);
+    }
+    
+    raf = requestAnimationFrame(animate);
+  }
+  
+  animate();
+  
+  // Retourne la fonction stop
+  return function stop() {
+    running = false;
+    if (raf) cancelAnimationFrame(raf);
+    const pc = pulseCanvas.getContext('2d');
+    if (pc) pc.clearRect(0, 0, pulseCanvas.width, pulseCanvas.height);
+    const ptc = partCanvas.getContext('2d');
+    if (ptc) ptc.clearRect(0, 0, partCanvas.width, partCanvas.height);
+  };
+}
+
+// Références aux fonctions stop des effets actifs
+let stopCardEffect = null;
+let stopRevealEffect = null;
+
+function stopAllParticleEffects() {
+  if (stopCardEffect) { stopCardEffect(); stopCardEffect = null; }
+  if (stopRevealEffect) { stopRevealEffect(); stopRevealEffect = null; }
+  stopParticles(); // particules de fond
+}
+
+// ════════════════════════════════════════
+//  CINEMA REVEAL — avec effet lumineux activé
+// ════════════════════════════════════════
 async function cinemaReveal(imgSrc) {
+  // Stop tout effet réveal précédent
+  if (stopRevealEffect) { stopRevealEffect(); stopRevealEffect = null; }
+  
   const revealDiv = document.getElementById('gen-result-reveal');
   const revealImg = document.getElementById('reveal-img');
-  revealImg.src = imgSrc; revealImg.classList.remove('reveal-anim');
+  const revealPartCanvas = document.getElementById('reveal-particles-canvas');
+  const revealMaskCanvas = document.getElementById('reveal-mask-canvas');
+  
+  revealImg.src = imgSrc;
+  revealImg.classList.remove('reveal-anim');
 
   const whiteFlash = document.getElementById('gen-white-flash');
   whiteFlash.classList.add('flash-in'); await sleep(120);
@@ -1047,12 +1530,45 @@ async function cinemaReveal(imgSrc) {
   await sleep(200); whiteFlash.classList.remove('flash-out');
 
   revealImg.classList.add('reveal-anim'); playSynthReveal();
+  
+  // Lance l'effet lumineux après que l'image soit chargée/dimensionnée
+  await sleep(400); // petit délai pour que le layout soit stable
+  
+  // Sync la taille des canvas réveal sur l'image
+  function syncRevealCanvases() {
+    const rect = revealImg.getBoundingClientRect();
+    if (rect.width > 0 && rect.height > 0) {
+      revealPartCanvas.width = rect.width;
+      revealPartCanvas.height = rect.height;
+      revealMaskCanvas.width = rect.width;
+      revealMaskCanvas.height = rect.height;
+      // Position les canvas exactement sur l'image
+      revealPartCanvas.style.width = rect.width + 'px';
+      revealPartCanvas.style.height = rect.height + 'px';
+      revealMaskCanvas.style.width = rect.width + 'px';
+      revealMaskCanvas.style.height = rect.height + 'px';
+    }
+  }
+  syncRevealCanvases();
+  
+  revealMaskCanvas.classList.add('active');
+  
+  // Démarre l'effet sur l'écran de révélation
+  stopRevealEffect = await startLightEffect(
+    imgSrc,
+    revealMaskCanvas,
+    revealPartCanvas,
+    80 // plus de particules pour le drama du reveal
+  );
 }
 
 function confirmReveal() {
   playSynthClick();
+  // Stop l'effet du reveal mais garde les données pour la carte
+  if (stopRevealEffect) { stopRevealEffect(); stopRevealEffect = null; }
   document.getElementById('gen-result-reveal').classList.remove('show');
   document.getElementById('reveal-img').classList.remove('reveal-anim');
+  document.getElementById('reveal-mask-canvas').classList.remove('active');
   showResult();
 }
 
@@ -1076,8 +1592,205 @@ function showResult() {
   const arch = ARCHETYPES[selectedArch];
   document.getElementById('result-img').src = resultImage;
   document.getElementById('res-name-em').textContent = userName;
-  document.getElementById('res-arch-badge').textContent = arch.emoji+' '+arch.label;
+  document.getElementById('res-arch-badge').textContent = arch.emoji + ' ' + arch.label;
+
+  // Contenu de la trading card
+  document.getElementById('card-name').textContent = userName;
+  document.getElementById('card-arch-sub').textContent = arch.label;
+  document.getElementById('card-badge-arch').textContent = arch.label;
+
   hideStatus(); showScreen('screen-result');
+
+  // Lance tout en parallèle après le rendu
+  requestAnimationFrame(async () => {
+    initParticles();    // particules de fond (zone gauche)
+    initCardTilt();     // effet 3D de la carte
+    loadLeaderboard();  // stats live
+
+    // Lance l'effet lumineux sur la carte
+    const pulseCanvas = document.getElementById('card-pulse-canvas');
+    const partCanvas = document.getElementById('card-particles-overlay');
+
+    // Attend que la carte soit rendue pour lire ses dimensions
+    await sleep(100);
+    const card = document.getElementById('hero-card');
+    pulseCanvas.width  = card.offsetWidth;
+    pulseCanvas.height = card.offsetHeight;
+    partCanvas.width   = card.offsetWidth;
+    partCanvas.height  = card.offsetHeight;
+
+    if (stopCardEffect) stopCardEffect();
+    stopCardEffect = await startLightEffect(
+      resultImage,
+      pulseCanvas,
+      partCanvas,
+      50 // 50 particules sur la carte
+    );
+  });
+}
+
+// ════════════════════════════════════════
+//  PARTICULES CANVAS (fond zone gauche — inchangé)
+// ════════════════════════════════════════
+let particlesRAF = null;
+
+function initParticles() {
+  const canvas = document.getElementById('particles-canvas');
+  const container = canvas.parentElement;
+  canvas.width  = container.offsetWidth;
+  canvas.height = container.offsetHeight;
+  const ctx = canvas.getContext('2d');
+
+  const N = 38;
+  const particles = Array.from({length: N}, () => ({
+    x: Math.random() * canvas.width,
+    y: Math.random() * canvas.height,
+    r: Math.random() * 2.2 + 0.6,
+    vx: (Math.random() - 0.5) * 0.35,
+    vy: (Math.random() - 0.55) * 0.45,
+    opacity: Math.random() * 0.4 + 0.1,
+    color: Math.random() > 0.6 ? '246,161,25' : '66,133,244'
+  }));
+
+  function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    for (const p of particles) {
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(${p.color},${p.opacity})`;
+      ctx.fill();
+
+      p.x += p.vx;
+      p.y += p.vy;
+
+      if (p.x < 0 || p.x > canvas.width)  p.vx *= -1;
+      if (p.y < 0 || p.y > canvas.height) p.vy *= -1;
+
+      p.opacity += (Math.random() - 0.5) * 0.012;
+      p.opacity = Math.max(0.05, Math.min(0.55, p.opacity));
+    }
+    particlesRAF = requestAnimationFrame(draw);
+  }
+  draw();
+}
+
+function stopParticles() {
+  if (particlesRAF) { cancelAnimationFrame(particlesRAF); particlesRAF = null; }
+  const canvas = document.getElementById('particles-canvas');
+  if (canvas) { const ctx = canvas.getContext('2d'); ctx.clearRect(0, 0, canvas.width, canvas.height); }
+}
+
+// ════════════════════════════════════════
+//  TILT 3D CARTE (inchangé)
+// ════════════════════════════════════════
+function initCardTilt() {
+  const wrapper = document.getElementById('card-tilt-wrapper');
+  const card    = document.getElementById('hero-card');
+  const shine   = document.getElementById('card-shine');
+
+  let targetRX = 0, targetRY = 0, currentRX = 0, currentRY = 0;
+
+  function lerp(a, b, t) { return a + (b - a) * t; }
+
+  function animateTilt() {
+    currentRX = lerp(currentRX, targetRX, 0.1);
+    currentRY = lerp(currentRY, targetRY, 0.1);
+    card.style.transform = `rotateX(${currentRX}deg) rotateY(${currentRY}deg) scale(1.02)`;
+    requestAnimationFrame(animateTilt);
+  }
+  animateTilt();
+
+  wrapper.addEventListener('mousemove', (e) => {
+    const rect = wrapper.getBoundingClientRect();
+    const cx = rect.left + rect.width  / 2;
+    const cy = rect.top  + rect.height / 2;
+    const dx = (e.clientX - cx) / (rect.width  / 2);
+    const dy = (e.clientY - cy) / (rect.height / 2);
+
+    targetRY =  dx * 8;
+    targetRX = -dy * 8;
+
+    const mx = ((e.clientX - rect.left) / rect.width  * 100).toFixed(1);
+    const my = ((e.clientY - rect.top)  / rect.height * 100).toFixed(1);
+    shine.style.setProperty('--mx', mx + '%');
+    shine.style.setProperty('--my', my + '%');
+  });
+
+  wrapper.addEventListener('mouseleave', () => {
+    targetRX = 0;
+    targetRY = 0;
+    card.style.boxShadow = '0 20px 60px rgba(38,47,99,0.35), 0 4px 16px rgba(38,47,99,0.15)';
+  });
+
+  wrapper.addEventListener('mouseenter', () => {
+    card.style.boxShadow = '0 28px 70px rgba(38,47,99,0.45), 0 8px 24px rgba(66,133,244,0.15)';
+  });
+}
+
+// ════════════════════════════════════════
+//  LEADERBOARD (inchangé)
+// ════════════════════════════════════════
+const ARCH_LABELS = {
+  'security-sentinel': '🛡️ Security Sentinel',
+  'ai-sorcerer':       '🧙 AI Sorcerer',
+  'cloud-architect':   '🏗️ Cloud Architect',
+  'data-wrangler':     '🗄️ Data Wrangler'
+};
+
+async function loadLeaderboard() {
+  const lbContent = document.getElementById('lb-content');
+  const lbTotal   = document.getElementById('lb-total');
+
+  try {
+    const res = await fetch(API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify({ action: 'getStats', secret: SECRET })
+    });
+    const data = await res.json();
+
+    if (!data.success) {
+      lbContent.innerHTML = '<div class="lb-loading">Stats indisponibles</div>';
+      return;
+    }
+
+    const sorted = Object.entries(data.counts)
+      .map(([k, v]) => ({ key: k, count: v }))
+      .sort((a, b) => b.count - a.count);
+
+    const maxCount = sorted[0]?.count || 1;
+    const rankLabels = ['①', '②', '③', '④'];
+    const rankClasses = ['gold', 'silver', 'bronze', ''];
+
+    let html = '';
+    sorted.forEach((item, i) => {
+      const isActive = item.key === selectedArch;
+      const pct = maxCount > 0 ? Math.round(item.count / maxCount * 100) : 0;
+      html += `
+        <div class="lb-row">
+          <span class="lb-rank ${rankClasses[i]}">${rankLabels[i]}</span>
+          <span class="lb-label ${isActive ? 'active-arch' : ''}">${ARCH_LABELS[item.key] || item.key}</span>
+          <div class="lb-bar-wrap">
+            <div class="lb-bar ${isActive ? 'active-bar' : ''}" data-pct="${pct}" style="width:0%"></div>
+          </div>
+          <span class="lb-count ${isActive ? 'active-count' : ''}">${item.count}</span>
+        </div>`;
+    });
+
+    lbContent.innerHTML = html;
+    lbTotal.textContent = `${data.total} avatar${data.total > 1 ? 's' : ''} généré${data.total > 1 ? 's' : ''} aujourd'hui`;
+    lbTotal.style.display = 'block';
+
+    requestAnimationFrame(() => {
+      document.querySelectorAll('.lb-bar').forEach(bar => {
+        const pct = bar.dataset.pct;
+        setTimeout(() => { bar.style.width = pct + '%'; }, 80);
+      });
+    });
+
+  } catch(e) {
+    lbContent.innerHTML = '<div class="lb-loading">Stats indisponibles</div>';
+  }
 }
 
 // ════════════════════════════════════════
@@ -1112,6 +1825,7 @@ function resetAll(silent) {
   document.getElementById('gen-result-reveal').classList.remove('show');
   document.getElementById('gen-white-flash').className = '';
   document.getElementById('form-overlay').classList.remove('open');
+  stopAllParticleEffects();
   if (!silent) showScreen('screen-choose');
 }
 
