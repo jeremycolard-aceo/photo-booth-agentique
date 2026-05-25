@@ -7,18 +7,42 @@ const LOGO_URL = 'https://raw.githubusercontent.com/jeremycolard-aceo/photo-boot
 const IDLE_TIMEOUT = 120;
 
 // ════════════════════════════════════════
-//  ARCHETYPES
+//  ARCHETYPES & PROMPT ENGINEERING
 // ════════════════════════════════════════
 const ARCHETYPES = {
-  'security-sentinel': { label: 'Security Sentinel', emoji: '🛡️', videoSrc: 'https://res.cloudinary.com/dayss50y9/video/upload/v1779697682/SENTINELLE_flwkop.mp4',              scene: `Holding a luminous shield...` },
-  'ai-sorcerer':       { label: 'AI Sorcerer',       emoji: '🧙', videoSrc: 'https://res.cloudinary.com/dayss50y9/video/upload/v1779697681/de_m%C3%AAme_avec_cette_image_a8uegn.mp4', scene: `Surrounded by glowing orbs...` },
-  'cloud-architect':   { label: 'Cloud Architect',   emoji: '🏗️', videoSrc: 'https://res.cloudinary.com/dayss50y9/video/upload/v1779697141/CLOUDARCHITECT_q22kix.mp4',          scene: `Standing on floating platform...` },
-  'data-wrangler':     { label: 'Data Wrangler',     emoji: '🗄️', videoSrc: 'https://res.cloudinary.com/dayss50y9/video/upload/v1779697141/DATAWRANGLER_jvhosa.mp4',              scene: `Flowing cape of data streams...` }
+  'security-sentinel': { 
+    label: 'Security Sentinel', 
+    emoji: '🛡️', 
+    videoSrc: 'https://res.cloudinary.com/dayss50y9/video/upload/v1779697682/SENTINELLE_flwkop.mp4',              
+    scene: `Holding a luminous shield engraved with cryptographic runes (hash symbols, key patterns), wearing armor made of stylized hexagonal locks in Google Cloud blue and green, with vault doors and golden keys floating in the background. Dramatic backlit lighting.` 
+  },
+  'ai-sorcerer': { 
+    label: 'AI Sorcerer',       
+    emoji: '🧙', 
+    videoSrc: 'https://res.cloudinary.com/dayss50y9/video/upload/v1779697681/de_m%C3%AAme_avec_cette_image_a8uegn.mp4', 
+    scene: `Surrounded by floating glowing orbs representing AI agents, hands radiating soft neural network patterns of light, wearing robes embroidered with Gemini-inspired geometric motifs. Wisps of stylized code circle around them like magical energy. Mystical aurora-like background.` 
+  },
+  'cloud-architect': { 
+    label: 'Cloud Architect',   
+    emoji: '🏗️', 
+    videoSrc: 'https://res.cloudinary.com/dayss50y9/video/upload/v1779697141/CLOUDARCHITECT_q22kix.mp4',          
+    scene: `Standing on a floating platform of stylized clouds, holding luminous architectural blueprints with Google Cloud iconography (kubernetes pods, service meshes, network nodes), wearing a tech-forward cape with subtle circuit patterns. Geometric towers made of clouds rise in the background.` 
+  },
+  'data-wrangler': { 
+    label: 'Data Wrangler',     
+    emoji: '🗄️', 
+    videoSrc: 'https://res.cloudinary.com/dayss50y9/video/upload/v1779697141/DATAWRANGLER_jvhosa.mp4',              
+    scene: `Wearing a flowing cape made of cascading data streams in blue and green, holding a glowing tablet projecting BigQuery-like schemas and SQL queries into the air, floating data particles in Google Cloud colors swirling around them. Subtle hexagonal patterns of data nodes in the background.` 
+  }
 };
 
 function buildPrompt(key) {
-  const a = ARCHETYPES[key];
-  return `A heroic stylized 3D illustration portrait based on the reference photo... Setting: ${a.scene}`;
+  const arch = ARCHETYPES[key];
+  return `A heroic stylized 3D illustration portrait based on the reference photo.
+CRITICAL: Preserve the exact facial features, skin tone, hair, and ethnicity of the person(s) in the reference image. The face(s) must remain clearly recognizable.
+COMPOSITION: The subject(s) must be perfectly centered in the frame. Maintain a well-balanced composition, showing the characters clearly from the chest or waist up.
+MULTIPLE SUBJECTS: If there are multiple people in the reference photo, you MUST generate the exact same number of characters. Apply the archetype theme, outfits, and magical elements to ALL characters present, ensuring they are posing together harmoniously in the center of the image.
+SETTING & THEME: ${arch.scene}`;
 }
 
 // ════════════════════════════════════════
