@@ -6,6 +6,7 @@
 <title>ACEO — Photo Booth</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Black+Ops+One&family=Bebas+Neue&family=Share+Tech+Mono&family=Rajdhani:wght@400;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <style>
 /* ── RESET ── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -482,7 +483,7 @@ canvas { display: none; }
   to   { opacity: 1; transform: scale(1); filter: brightness(1) blur(0); }
 }
 
-/* Canvas reveal particules (simples, dans index.html) */
+/* Canvas reveal particules */
 #reveal-particles-canvas {
   position: absolute; inset: 0; z-index: 2;
   pointer-events: none; border-radius: 4px;
@@ -563,6 +564,26 @@ canvas { display: none; }
 }
 
 .result-actions { display: flex; flex-direction: column; gap: 10px; }
+
+/* NOUVEAU : QR CODE SECTION */
+.qr-section {
+  display: flex; align-items: center; gap: 16px;
+  background: var(--blanc-casse); border: 1px solid var(--border);
+  border-radius: 8px; padding: 16px; margin-bottom: 8px;
+}
+.qr-text {
+  font-family: 'Share Tech Mono', monospace; font-size: 13px; color: var(--bleu-nuit);
+  line-height: 1.4;
+}
+.qr-text strong { color: var(--bleu-google); font-size: 15px; display: block; margin-bottom: 4px;}
+#qr-code-container {
+  flex-shrink: 0; width: 96px; height: 96px;
+  background: var(--blanc); border-radius: 4px;
+  display: flex; align-items: center; justify-content: center;
+  padding: 4px;
+}
+#qr-code-container img { max-width: 100%; height: auto; }
+
 .btn-action {
   padding: 16px 24px; border-radius: 4px; font-family: 'Black Ops One', cursive;
   font-size: 15px; text-transform: uppercase; cursor: pointer; border: none;
@@ -841,7 +862,6 @@ canvas { display: none; }
   </div>
 
   <div class="screen" id="screen-result">
-
     <div class="result-left">
       <iframe
         id="card-iframe"
@@ -857,6 +877,14 @@ canvas { display: none; }
       <div class="result-arch-badge" id="res-arch-badge">— Archétype —</div>
 
       <div class="result-actions">
+        <div class="qr-section" id="qr-section" style="display:none;">
+          <div id="qr-code-container"></div>
+          <div class="qr-text">
+            <strong>Scannez-moi</strong>
+            pour récupérer l'image directement sur votre smartphone.
+          </div>
+        </div>
+
         <button class="btn-action btn-action-primary" onclick="sendEmail()">
           Recevoir mon avatar par email →
         </button>
@@ -882,7 +910,6 @@ canvas { display: none; }
         </div>
       </div>
     </div>
-
   </div>
 </div>
 
