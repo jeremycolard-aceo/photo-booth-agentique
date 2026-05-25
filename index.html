@@ -164,7 +164,6 @@ body::before {
   color: var(--bleu-google);
 }
 
-/* Grille 4 panneaux */
 .arch-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -483,17 +482,11 @@ canvas { display: none; }
   to   { opacity: 1; transform: scale(1); filter: brightness(1) blur(0); }
 }
 
+/* Canvas reveal particules (simples, dans index.html) */
 #reveal-particles-canvas {
   position: absolute; inset: 0; z-index: 2;
   pointer-events: none; border-radius: 4px;
 }
-#reveal-mask-canvas {
-  position: absolute; inset: 0; z-index: 3;
-  pointer-events: none; border-radius: 4px;
-  opacity: 0; mix-blend-mode: screen;
-  transition: opacity 0.6s ease;
-}
-#reveal-mask-canvas.active { opacity: 1; }
 
 #gen-result-cta {
   margin-top: 28px; font-family: 'Black Ops One', cursive;
@@ -532,89 +525,19 @@ canvas { display: none; }
 ══════════════════════════════════ */
 #screen-result { flex-direction: row; overflow: hidden; }
 
-/* ── ZONE GAUCHE : canvas particules + carte ── */
+/* ── ZONE GAUCHE : iframe card.html ── */
 .result-left {
   flex: 1.1;
   position: relative;
-  display: flex; align-items: center; justify-content: center;
-  padding: 28px 20px 28px 44px;
   overflow: hidden;
+  border-right: 1px solid var(--border);
 }
 
-#particles-canvas {
-  position: absolute; inset: 0; z-index: 0;
-  pointer-events: none;
-}
-
-.card-tilt-wrapper {
-  position: relative; z-index: 1;
-  width: 100%; max-width: 420px;
-  perspective: 900px;
-  cursor: default;
-}
-
-/* ── TRADING CARD ── */
-.hero-card {
-  position: relative; width: 100%; aspect-ratio: 3/4;
-  border-radius: 16px; overflow: hidden;
-  transform-style: preserve-3d;
-  transition: transform 0.12s ease-out, box-shadow 0.12s ease-out;
-  box-shadow: 0 20px 60px rgba(38, 47, 99, 0.35), 0 4px 16px rgba(38, 47, 99, 0.15);
-  will-change: transform;
-}
-.hero-card .card-photo {
-  position: absolute; inset: 0; width: 100%; height: 100%;
-  object-fit: cover; display: block;
-}
-#card-pulse-canvas {
-  position: absolute; inset: 0; z-index: 2;
-  pointer-events: none; border-radius: 16px;
-  mix-blend-mode: screen;
-}
-#card-particles-overlay {
-  position: absolute; inset: 0; z-index: 3;
-  pointer-events: none; border-radius: 16px;
-}
-.hero-card .card-shine {
-  position: absolute; inset: 0; z-index: 4;
-  background: radial-gradient(circle at var(--mx, 50%) var(--my, 50%),
-    rgba(255,255,255,0.18) 0%, rgba(255,255,255,0.06) 30%, transparent 65%);
-  border-radius: 16px; pointer-events: none;
-  transition: background 0.08s; mix-blend-mode: screen;
-}
-.hero-card .card-overlay {
-  position: absolute; inset: 0; z-index: 5;
-  background: linear-gradient(to bottom, transparent 45%, rgba(38, 47, 99, 0.55) 70%, rgba(38, 47, 99, 0.92) 100%);
-}
-.hero-card .card-content {
-  position: absolute; bottom: 0; left: 0; right: 0; z-index: 6;
-  padding: 20px 22px 22px;
-}
-.hero-card .card-badge {
-  display: inline-block; font-family: 'Share Tech Mono', monospace;
-  font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase;
-  padding: 5px 12px; background: var(--bleu-google);
-  color: var(--blanc); border-radius: 3px; margin-bottom: 8px;
-}
-.hero-card .card-name {
-  font-family: 'Black Ops One', cursive;
-  font-size: clamp(22px, 2.8vw, 36px); color: var(--blanc);
-  text-transform: uppercase; letter-spacing: 0.04em;
-  line-height: 1; text-shadow: 0 2px 8px rgba(0,0,0,0.6);
-}
-.hero-card .card-arch {
-  font-family: 'Share Tech Mono', monospace;
-  font-size: 13px; letter-spacing: 0.1em;
-  color: rgba(255,255,255,0.7); text-transform: uppercase; margin-top: 4px;
-}
-.hero-card .card-logo {
-  position: absolute; bottom: 18px; right: 18px; z-index: 7;
-  height: 36px; opacity: 0.95;
-}
-.hero-card::before {
-  content: ''; position: absolute; inset: 0; z-index: 8;
-  border-radius: 16px; border: 1.5px solid rgba(255,255,255,0.25);
-  pointer-events: none;
+#card-iframe {
+  width: 100%; height: 100%;
+  border: none;
+  display: block;
+  background: transparent;
 }
 
 /* ── ZONE DROITE — actions + leaderboard ── */
@@ -710,7 +633,6 @@ canvas { display: none; }
 }
 .gallery-title::after { content: ''; flex: 1; height: 1px; background: var(--border); }
 
-/* Wrapper scroll horizontal */
 .gallery-carousel {
   display: flex;
   gap: 10px;
@@ -719,7 +641,6 @@ canvas { display: none; }
   scroll-snap-type: x mandatory;
   -webkit-overflow-scrolling: touch;
   padding-bottom: 8px;
-  /* Masque la scrollbar mais garde la fonctionnalité */
   scrollbar-width: thin;
   scrollbar-color: var(--bleu-google) transparent;
 }
@@ -749,14 +670,13 @@ canvas { display: none; }
 }
 
 .gallery-item img {
-  display: block;           /* ← important : évite l'espace parasite sous l'image */
+  display: block;
   width: 100%; height: 100%;
   object-fit: cover;
   transition: transform 0.3s;
 }
 .gallery-item:hover img { transform: scale(1.1); }
 
-/* Lightbox survol */
 .gallery-lightbox-hint {
   position: absolute; inset: 0; z-index: 3;
   background: rgba(38, 47, 99, 0.5);
@@ -766,7 +686,6 @@ canvas { display: none; }
 }
 .gallery-item:hover .gallery-lightbox-hint { opacity: 1; }
 
-/* Navigation prev/next */
 .gallery-nav {
   display: flex; gap: 6px; margin-top: 8px;
 }
@@ -790,7 +709,7 @@ canvas { display: none; }
 }
 
 /* ══════════════════════════════════
-   LIGHTBOX (plein écran)
+   LIGHTBOX
 ══════════════════════════════════ */
 #gallery-lightbox {
   display: none;
@@ -834,7 +753,6 @@ canvas { display: none; }
   <div id="reveal-img-wrapper">
     <img id="reveal-img" src="" alt="Avatar révélé">
     <canvas id="reveal-particles-canvas"></canvas>
-    <canvas id="reveal-mask-canvas"></canvas>
   </div>
   <button id="gen-result-cta" onclick="confirmReveal()">Voir mon profil →</button>
 </div>
@@ -931,26 +849,19 @@ canvas { display: none; }
   <!-- ÉCRAN C : RÉSULTAT -->
   <div class="screen" id="screen-result">
 
-    <!-- Zone gauche : particules + trading card tiltable -->
+    <!-- Zone gauche : iframe vers card.html -->
     <div class="result-left">
-      <canvas id="particles-canvas"></canvas>
-      <div class="card-tilt-wrapper" id="card-tilt-wrapper">
-        <div class="hero-card" id="hero-card">
-          <img class="card-photo" id="result-img" src="" alt="Votre avatar">
-          <canvas id="card-pulse-canvas"></canvas>
-          <canvas id="card-particles-overlay"></canvas>
-          <div class="card-overlay"></div>
-          <div class="card-shine" id="card-shine"></div>
-          <div class="card-content">
-            <div class="card-badge" id="card-badge-arch">—</div>
-            <div class="card-name" id="card-name">Prénom</div>
-            <div class="card-arch" id="card-arch-sub">Archétype</div>
-          </div>
-          <img class="card-logo"
-               src="https://raw.githubusercontent.com/jeremycolard-aceo/photo-booth-agentique/main/logo-aceo.png"
-               alt="ACEO" onerror="this.style.display='none'">
-        </div>
-      </div>
+      <!--
+        L'iframe charge card.html (même dossier).
+        index.html lui envoie les données via postMessage une fois chargée.
+        allow="cross-origin-isolated" si besoin de SharedArrayBuffer, pas nécessaire ici.
+      -->
+      <iframe
+        id="card-iframe"
+        src="card.html"
+        title="Trading Card Avatar"
+        sandbox="allow-scripts allow-same-origin"
+      ></iframe>
     </div>
 
     <!-- Zone droite : infos + actions + leaderboard + galerie -->
@@ -1022,10 +933,6 @@ canvas { display: none; }
 </div>
 
 <!-- Audio éléments -->
-<audio id="snd-hover"   preload="auto"></audio>
-<audio id="snd-click"   preload="auto"></audio>
-<audio id="snd-shutter" preload="auto"></audio>
-<audio id="snd-reveal"  preload="auto"></audio>
 <audio id="snd-ambient" loop preload="auto"></audio>
 
 <script>
@@ -1037,11 +944,32 @@ const SECRET   = 'ton-uuid-secret';
 const LOGO_URL = 'https://raw.githubusercontent.com/jeremycolard-aceo/photo-booth-agentique/main/logo-aceo.png';
 const IDLE_TIMEOUT = 120;
 
-const BRIGHTNESS_THRESHOLD = 191;
-const PARTICLE_COLORS = ['66,133,244', '246,161,25', '255,255,255'];
+// ════════════════════════════════════════
+//  ARCHETYPES
+// ════════════════════════════════════════
+const ARCHETYPES = {
+  'security-sentinel': { label: 'Security Sentinel', emoji: '🛡️', videoSrc: 'https://res.cloudinary.com/dayss50y9/video/upload/v1779697682/SENTINELLE_flwkop.mp4',             scene: `Holding a luminous shield...` },
+  'ai-sorcerer':       { label: 'AI Sorcerer',       emoji: '🧙', videoSrc: 'https://res.cloudinary.com/dayss50y9/video/upload/v1779697681/de_m%C3%AAme_avec_cette_image_a8uegn.mp4', scene: `Surrounded by glowing orbs...` },
+  'cloud-architect':   { label: 'Cloud Architect',   emoji: '🏗️', videoSrc: 'https://res.cloudinary.com/dayss50y9/video/upload/v1779697141/CLOUDARCHITECT_q22kix.mp4',          scene: `Standing on floating platform...` },
+  'data-wrangler':     { label: 'Data Wrangler',     emoji: '🗄️', videoSrc: 'https://res.cloudinary.com/dayss50y9/video/upload/v1779697141/DATAWRANGLER_jvhosa.mp4',             scene: `Flowing cape of data streams...` }
+};
+
+function buildPrompt(key) {
+  const a = ARCHETYPES[key];
+  return `A heroic stylized 3D illustration portrait based on the reference photo... Setting: ${a.scene}`;
+}
 
 // ════════════════════════════════════════
-//  AUDIO ENGINE
+//  STATE
+// ════════════════════════════════════════
+let selectedArch = null, userName = '', userEmail = '';
+let camStream = null, capturedB64 = null, resultImage = null;
+let currentFileId = null;
+let idleInterval = null, idleSeconds = 0, countdownInt = null, loadingMsgInterval = null;
+let genProgressInterval = null;
+
+// ════════════════════════════════════════
+//  AUDIO ENGINE (Web Audio synthétique)
 // ════════════════════════════════════════
 let audioCtx = null;
 function getAudio() {
@@ -1049,48 +977,7 @@ function getAudio() {
   return audioCtx;
 }
 function resumeAudio() { if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume(); }
-// Configuration des particules
-let particles = [];
-const particleCount = 50; // Ajuste le nombre selon tes besoins
 
-function initParticles() {
-    particles = [];
-    for (let i = 0; i < particleCount; i++) {
-        particles.push({
-            x: Math.random() * canvas.width,
-            y: Math.random() * canvas.height,
-            size: Math.random() * 2 + 0.5,
-            speedX: (Math.random() - 0.5) * 0.4,
-            speedY: (Math.random() - 0.5) * 0.4,
-            alpha: Math.random()
-        });
-    }
-}
-   function drawParticles(pulse) {
-    ctx.save();
-    // Les particules brillent en même temps que le boost lumineux
-    ctx.globalAlpha = 0.4 + (pulse * 0.6);
-    ctx.fillStyle = "white";
-    ctx.shadowBlur = 8 * pulse;
-    ctx.shadowColor = "rgba(255, 255, 255, 0.8)";
-
-    particles.forEach(p => {
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-        ctx.fill();
-
-        // Animation des positions
-        p.x += p.speedX;
-        p.y += p.speedY;
-
-        // Téléportation de l'autre côté si sortie du cadre (effet infini)
-        if (p.x < 0) p.x = canvas.width;
-        if (p.x > canvas.width) p.x = 0;
-        if (p.y < 0) p.y = canvas.height;
-        if (p.y > canvas.height) p.y = 0;
-    });
-    ctx.restore();
-}
 function playSynthHover() {
   try {
     const ctx = getAudio(); const osc = ctx.createOscillator(); const gain = ctx.createGain();
@@ -1102,7 +989,6 @@ function playSynthHover() {
     osc.start(ctx.currentTime); osc.stop(ctx.currentTime + 0.1);
   } catch(e) {}
 }
-
 function playSynthClick() {
   try {
     const ctx = getAudio();
@@ -1115,16 +1001,6 @@ function playSynthClick() {
     osc.start(); osc.stop(ctx.currentTime + 0.15);
   } catch(e) {}
 }
-
-function playArchVideo(panel) {
-  const v = panel.querySelector('video');
-  if (v) v.play().catch(() => {});
-}
-function pauseArchVideo(panel) {
-  const v = panel.querySelector('video');
-  if (v) v.pause();
-}
-
 function playSynthShutter() {
   try {
     const ctx = getAudio();
@@ -1138,12 +1014,10 @@ function playSynthShutter() {
     });
   } catch(e) {}
 }
-
 function playSynthReveal() {
   try {
     const ctx = getAudio();
-    const freqs = [220, 277, 330, 415, 523, 659, 830, 1046];
-    freqs.forEach((f, i) => {
+    [220, 277, 330, 415, 523, 659, 830, 1046].forEach((f, i) => {
       const osc = ctx.createOscillator(); const gain = ctx.createGain();
       osc.connect(gain); gain.connect(ctx.destination);
       osc.frequency.value = f; osc.type = 'sine';
@@ -1168,7 +1042,6 @@ function startAmbient() {
     ambientPlaying = true;
   }).catch(() => { startSynthAmbient(); });
 }
-
 function startSynthAmbient() {
   try {
     const ctx = getAudio(); const aGain = ctx.createGain(); aGain.gain.value = 0;
@@ -1191,6 +1064,9 @@ function startSynthAmbient() {
   } catch(e) {}
 }
 
+// ════════════════════════════════════════
+//  SONS hover/click sur les boutons
+// ════════════════════════════════════════
 function attachSounds() {
   document.querySelectorAll('.arch-panel, .btn-action, .btn-validate, .btn-shutter, #btn-home, .btn-action-ghost, .btn-action-primary').forEach(el => {
     el.addEventListener('mouseenter', () => { resumeAudio(); playSynthHover(); });
@@ -1201,35 +1077,14 @@ function attachSounds() {
 }
 
 // ════════════════════════════════════════
-//  ARCHETYPES
-// ════════════════════════════════════════
-const ARCHETYPES = {
-  'security-sentinel': { label: 'Security Sentinel', emoji: '🛡️', videoSrc: 'https://res.cloudinary.com/dayss50y9/video/upload/v1779697682/SENTINELLE_flwkop.mp4',             scene: `Holding a luminous shield...` },
-  'ai-sorcerer':       { label: 'AI Sorcerer',       emoji: '🧙', videoSrc: 'https://res.cloudinary.com/dayss50y9/video/upload/v1779697681/de_m%C3%AAme_avec_cette_image_a8uegn.mp4', scene: `Surrounded by glowing orbs...` },
-  'cloud-architect':   { label: 'Cloud Architect',   emoji: '🏗️', videoSrc: 'https://res.cloudinary.com/dayss50y9/video/upload/v1779697141/CLOUDARCHITECT_q22kix.mp4',          scene: `Standing on floating platform...` },
-  'data-wrangler':     { label: 'Data Wrangler',     emoji: '🗄️', videoSrc: 'https://res.cloudinary.com/dayss50y9/video/upload/v1779697141/DATAWRANGLER_jvhosa.mp4',             scene: `Flowing cape of data streams...` }
-};
-function buildPrompt(key) {
-  const a = ARCHETYPES[key];
-  return `A heroic stylized 3D illustration portrait based on the reference photo... Setting: ${a.scene}`;
-}
-
-// ════════════════════════════════════════
-//  STATE
-// ════════════════════════════════════════
-let selectedArch = null, userName = '', userEmail = '';
-let camStream = null, capturedB64 = null, resultImage = null;
-let currentFileId = null; // ID Drive du fichier généré
-let idleInterval = null, idleSeconds = 0, countdownInt = null, loadingMsgInterval = null;
-
-// ════════════════════════════════════════
 //  VEILLE & NAVIGATION
 // ════════════════════════════════════════
 document.getElementById('screen-video').addEventListener('click', exitVideo);
-document.getElementById('idle-video').play().catch(()=>{});
+document.getElementById('idle-video').play().catch(() => {});
 
 function exitVideo() {
-  resumeAudio(); if (!ambientPlaying) startAmbient();
+  resumeAudio();
+  if (!ambientPlaying) startAmbient();
   document.getElementById('screen-video').style.display = 'none';
   document.getElementById('app').classList.add('visible');
   showScreen('screen-choose');
@@ -1237,22 +1092,22 @@ function exitVideo() {
 }
 function goToSleep() {
   clearInterval(idleInterval); unbindIdleEvents(); resetAll(true);
-  stopAllParticleEffects();
   document.getElementById('app').classList.remove('visible');
   document.getElementById('screen-video').style.display = 'flex';
-  document.getElementById('idle-video').play().catch(()=>{});
+  document.getElementById('idle-video').play().catch(() => {});
 }
 function goHome() {
-  playSynthClick(); resetAll(true); stopAllParticleEffects();
+  playSynthClick(); resetAll(true);
   document.getElementById('app').classList.remove('visible');
   document.getElementById('screen-video').style.display = 'flex';
-  document.getElementById('idle-video').play().catch(()=>{});
+  document.getElementById('idle-video').play().catch(() => {});
 }
 
 function resetIdleTimer() {
   idleSeconds = 0; clearInterval(idleInterval); updateIdleBar(0);
   idleInterval = setInterval(() => {
-    idleSeconds++; updateIdleBar(idleSeconds / IDLE_TIMEOUT);
+    idleSeconds++;
+    updateIdleBar(idleSeconds / IDLE_TIMEOUT);
     if (idleSeconds >= IDLE_TIMEOUT) goToSleep();
   }, 1000);
 }
@@ -1266,6 +1121,42 @@ function showScreen(id) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
   setTimeout(attachSounds, 50);
+}
+
+// ════════════════════════════════════════
+//  IFRAME CARD — communication postMessage
+// ════════════════════════════════════════
+
+/**
+ * Envoie les données de la carte à l'iframe card.html.
+ * On attend que l'iframe soit prête (event "CARD_READY") ou on réessaie après délai.
+ */
+let cardIframeReady = false;
+
+function getCardIframe() { return document.getElementById('card-iframe'); }
+
+// Écoute le signal "CARD_READY" de l'iframe
+window.addEventListener('message', (e) => {
+  if (e.data && e.data.type === 'CARD_READY') {
+    cardIframeReady = true;
+  }
+});
+
+/**
+ * Envoie les données carte à l'iframe.
+ * Si l'iframe n'est pas encore prête, on attend 200ms et on réessaie (max 20 fois).
+ */
+function sendCardData(imageSrc, name, archLabel, attempts = 0) {
+  const iframe = getCardIframe();
+  if (!iframe) return;
+
+  const payload = { type: 'CARD_DATA', imageSrc, name, archLabel };
+
+  if (cardIframeReady || attempts > 20) {
+    iframe.contentWindow.postMessage(payload, '*');
+  } else {
+    setTimeout(() => sendCardData(imageSrc, name, archLabel, attempts + 1), 200);
+  }
 }
 
 // ════════════════════════════════════════
@@ -1296,14 +1187,17 @@ function submitForm() {
   closeForm(); goCapture();
   fetch(API_URL, {
     method: 'POST',
-    headers: {'Content-Type': 'text/plain;charset=utf-8'},
+    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
     body: JSON.stringify({ action: 'logUser', secret: SECRET, nom: userName, email: userEmail, archetype: selectedArch })
-  }).catch(()=>{});
+  }).catch(() => {});
 }
 
 // ════════════════════════════════════════
 //  CAPTURE
 // ════════════════════════════════════════
+function playArchVideo(panel) { const v = panel.querySelector('video'); if (v) v.play().catch(() => {}); }
+function pauseArchVideo(panel) { const v = panel.querySelector('video'); if (v) v.pause(); }
+
 async function goCapture() {
   const arch = ARCHETYPES[selectedArch];
   const capVideo = document.getElementById('cap-arch-video');
@@ -1315,7 +1209,7 @@ async function goCapture() {
   await initCam();
 }
 async function initCam() {
-  if (camStream) { camStream.getTracks().forEach(t=>t.stop()); camStream = null; }
+  if (camStream) { camStream.getTracks().forEach(t => t.stop()); camStream = null; }
   try {
     camStream = await navigator.mediaDevices.getUserMedia({ video: { width: 1280, height: 720 }, audio: false });
     document.getElementById('cam-video').srcObject = camStream;
@@ -1348,16 +1242,14 @@ function takePhoto() {
   const ctx = c.getContext('2d'); ctx.translate(c.width, 0); ctx.scale(-1, 1); ctx.drawImage(vid, 0, 0);
   capturedB64 = c.toDataURL('image/jpeg', 0.85);
   const fl = document.getElementById('flash'); fl.classList.add('go');
-  setTimeout(()=>fl.classList.remove('go'), 180);
-  if (camStream) { camStream.getTracks().forEach(t=>t.stop()); camStream = null; }
+  setTimeout(() => fl.classList.remove('go'), 180);
+  if (camStream) { camStream.getTracks().forEach(t => t.stop()); camStream = null; }
   generateAvatar();
 }
 
 // ════════════════════════════════════════
 //  GÉNÉRATION
 // ════════════════════════════════════════
-let genProgressInterval = null;
-
 async function generateAvatar() {
   const whiteFlash = document.getElementById('gen-white-flash');
   whiteFlash.classList.add('flash-in'); await sleep(140);
@@ -1392,14 +1284,14 @@ async function generateAvatar() {
   try {
     const res = await fetch(API_URL, {
       method: 'POST',
-      headers: {'Content-Type': 'text/plain;charset=utf-8'},
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
       body: JSON.stringify({
         action:    'transform',
         secret:    SECRET,
         image:     capturedB64,
         prompt:    buildPrompt(selectedArch),
         archetype: selectedArch,
-        nom:       userName   // ← transmis pour le nom du fichier Drive
+        nom:       userName
       })
     });
     resultData = await res.json();
@@ -1421,7 +1313,6 @@ async function generateAvatar() {
     return;
   }
 
-  // Stocke l'ID Drive reçu depuis Apps Script
   currentFileId = resultData.fileId || null;
 
   try { resultImage = await addLogo(resultData.image); }
@@ -1431,140 +1322,33 @@ async function generateAvatar() {
 }
 
 // ════════════════════════════════════════
-//  EFFET LUMINEUX
+//  LOGO
 // ════════════════════════════════════════
-async function buildLightMask(imgSrc, w, h) {
-  const img = await loadImg(imgSrc);
-  const analyseCanvas = document.createElement('canvas');
-  analyseCanvas.width = w; analyseCanvas.height = h;
-  const analyseCtx = analyseCanvas.getContext('2d');
-  analyseCtx.drawImage(img, 0, 0, w, h);
-  const imageData = analyseCtx.getImageData(0, 0, w, h);
-  const data = imageData.data;
-  const brightPixels = [];
-  for (let i = 0; i < data.length; i += 4) {
-    const r = data[i], g = data[i+1], b = data[i+2];
-    const brightness = 0.2126 * r + 0.7152 * g + 0.0722 * b;
-    if (brightness < BRIGHTNESS_THRESHOLD) {
-      data[i + 3] = 0;
-    } else {
-      if (Math.random() > 0.93) {
-        const pixelIndex = i / 4;
-        brightPixels.push({ x: (pixelIndex % w) / w, y: Math.floor(pixelIndex / w) / h });
-      }
-    }
-  }
-  analyseCtx.putImageData(imageData, 0, 0);
-  return { brightPixels, maskCanvas: analyseCanvas };
+function loadImg(src) {
+  return new Promise((res, rej) => {
+    const img = new Image(); img.crossOrigin = 'anonymous';
+    img.onload = () => res(img); img.onerror = () => rej();
+    img.src = src;
+  });
 }
-
-async function startLightEffect(imgSrc, pulseCanvas, partCanvas, particleCount = 60) {
-  let running = true;
-  let raf = null;
-
-  function syncSize() {
-    const parent = pulseCanvas.parentElement;
-    if (!parent) return;
-    const w = parent.offsetWidth, h = parent.offsetHeight;
-    if (pulseCanvas.width !== w || pulseCanvas.height !== h) {
-      pulseCanvas.width = w; pulseCanvas.height = h;
-      partCanvas.width  = w; partCanvas.height  = h;
-    }
-  }
-  syncSize();
-
-  const analysisW = 256;
-  const analysisH = Math.round(analysisW * (pulseCanvas.height / pulseCanvas.width || 1.33));
-  let brightPixels = [], maskCanvas = null;
-  try {
-    const result = await buildLightMask(imgSrc, analysisW, analysisH);
-    brightPixels = result.brightPixels; maskCanvas = result.maskCanvas;
-  } catch(e) {
-    for (let i = 0; i < 40; i++) brightPixels.push({ x: Math.random(), y: Math.random() * 0.7 });
-  }
-
-  class Particle {
-    constructor() { this.reset(); }
-    reset() {
-      if (brightPixels.length > 0) {
-        const pt = brightPixels[Math.floor(Math.random() * brightPixels.length)];
-        this.x = pt.x * partCanvas.width  + (Math.random() - 0.5) * 20;
-        this.y = pt.y * partCanvas.height + (Math.random() - 0.5) * 20;
-      } else {
-        this.x = Math.random() * partCanvas.width;
-        this.y = Math.random() * partCanvas.height;
-      }
-      this.size   = Math.random() * 2.5 + 0.8;
-      this.speedX = (Math.random() - 0.5) * 1.2;
-      this.speedY = -(Math.random() * 1.5 + 0.3);
-      this.life   = 1.0;
-      this.decay  = Math.random() * 0.018 + 0.006;
-      this.color  = PARTICLE_COLORS[Math.floor(Math.random() * PARTICLE_COLORS.length)];
-    }
-    update() {
-      this.x += this.speedX; this.y += this.speedY; this.life -= this.decay;
-      if (this.life <= 0) this.reset();
-    }
-    draw(ctx) {
-      ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-      ctx.fillStyle = `rgba(${this.color},${this.life * 0.85})`; ctx.fill();
-    }
-  }
-
-  const particles = Array.from({ length: particleCount }, () => new Particle());
-
-  function animate() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    
-    const time = performance.now() / 1000; 
-    const pulse = (Math.sin(time * 2.5) + 1) / 2; // Fréquence de pulsation
-    
-    // 1. Image de base
-    ctx.globalAlpha = 1.0;
-    ctx.drawImage(img, 0, 0);
-
-    // 2. Particules (entre l'image et le glow)
-    drawParticles(pulse);
-
-    // 3. Effet Boost Lumineux (Screen mode)
-    ctx.save();
-    ctx.globalCompositeOperation = "screen"; 
-    ctx.globalAlpha = 0.1 + (pulse * 0.7); // Intensité du boost
-    ctx.shadowBlur = 35 * pulse;           // Étendue de la lueur
-    ctx.shadowColor = "white";
-    ctx.drawImage(maskCanvas, 0, 0);
-    ctx.restore();
-
-    requestAnimationFrame(animate);
-}
-  animate();
-
-  return function stop() {
-    running = false;
-    if (raf) cancelAnimationFrame(raf);
-    const pc = pulseCanvas.getContext('2d'); if (pc) pc.clearRect(0, 0, pulseCanvas.width, pulseCanvas.height);
-    const ptc = partCanvas.getContext('2d'); if (ptc) ptc.clearRect(0, 0, partCanvas.width, partCanvas.height);
-  };
-}
-
-let stopCardEffect = null;
-let stopRevealEffect = null;
-
-function stopAllParticleEffects() {
-  if (stopCardEffect)   { stopCardEffect(); stopCardEffect = null; }
-  if (stopRevealEffect) { stopRevealEffect(); stopRevealEffect = null; }
-  stopParticles();
+async function addLogo(base64) {
+  const [base, logo] = await Promise.all([loadImg(base64), loadImg(LOGO_URL)]);
+  const c = document.createElement('canvas'); c.width = base.width; c.height = base.height;
+  const ctx = c.getContext('2d'); ctx.drawImage(base, 0, 0);
+  const lw = base.width * 0.25, lh = lw * (logo.height / logo.width), m = base.width * 0.025;
+  ctx.globalAlpha = 1; ctx.drawImage(logo, base.width - lw - m, base.height - lh - m, lw, lh);
+  return c.toDataURL('image/png');
 }
 
 // ════════════════════════════════════════
-//  CINEMA REVEAL
+//  REVEAL CINÉMATIQUE (simplifié, dans index.html)
 // ════════════════════════════════════════
+let revealParticlesRAF = null;
+
 async function cinemaReveal(imgSrc) {
-  if (stopRevealEffect) { stopRevealEffect(); stopRevealEffect = null; }
   const revealDiv        = document.getElementById('gen-result-reveal');
   const revealImg        = document.getElementById('reveal-img');
   const revealPartCanvas = document.getElementById('reveal-particles-canvas');
-  const revealMaskCanvas = document.getElementById('reveal-mask-canvas');
 
   revealImg.src = imgSrc;
   revealImg.classList.remove('reveal-anim');
@@ -1578,49 +1362,66 @@ async function cinemaReveal(imgSrc) {
   revealImg.classList.add('reveal-anim'); playSynthReveal();
   await sleep(400);
 
-  function syncRevealCanvases() {
-    const rect = revealImg.getBoundingClientRect();
-    if (rect.width > 0 && rect.height > 0) {
-      revealPartCanvas.width  = rect.width;  revealPartCanvas.height = rect.height;
-      revealMaskCanvas.width  = rect.width;  revealMaskCanvas.height = rect.height;
-      revealPartCanvas.style.width  = rect.width  + 'px';
-      revealPartCanvas.style.height = rect.height + 'px';
-      revealMaskCanvas.style.width  = rect.width  + 'px';
-      revealMaskCanvas.style.height = rect.height + 'px';
-    }
-  }
-  syncRevealCanvases();
-  revealMaskCanvas.classList.add('active');
+  // Petits particules dorées autour du reveal
+  startRevealParticles(revealPartCanvas, revealImg);
+}
 
-  stopRevealEffect = await startLightEffect(imgSrc, revealMaskCanvas, revealPartCanvas, 80);
+function startRevealParticles(canvas, imgEl) {
+  stopRevealParticles();
+  function sync() {
+    const rect = imgEl.getBoundingClientRect();
+    canvas.width  = rect.width;
+    canvas.height = rect.height;
+    canvas.style.width  = rect.width  + 'px';
+    canvas.style.height = rect.height + 'px';
+    return { w: rect.width, h: rect.height };
+  }
+  const { w, h } = sync();
+  if (w === 0 || h === 0) return;
+
+  const ctx = canvas.getContext('2d');
+  const COLORS = ['66,133,244', '246,161,25', '255,255,255'];
+  const particles = Array.from({ length: 60 }, () => ({
+    x: Math.random() * w, y: Math.random() * h,
+    r: Math.random() * 2 + 0.5,
+    vx: (Math.random() - 0.5) * 1.0,
+    vy: -(Math.random() * 1.2 + 0.2),
+    life: Math.random(),
+    decay: Math.random() * 0.012 + 0.005,
+    color: COLORS[Math.floor(Math.random() * COLORS.length)]
+  }));
+
+  function draw() {
+    const { w, h } = sync();
+    ctx.clearRect(0, 0, w, h);
+    for (const p of particles) {
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(${p.color},${Math.max(0, p.life) * 0.8})`;
+      ctx.fill();
+      p.x += p.vx; p.y += p.vy; p.life -= p.decay;
+      if (p.life <= 0) {
+        p.x = Math.random() * w; p.y = Math.random() * h;
+        p.life = 1.0;
+      }
+    }
+    revealParticlesRAF = requestAnimationFrame(draw);
+  }
+  draw();
+}
+
+function stopRevealParticles() {
+  if (revealParticlesRAF) { cancelAnimationFrame(revealParticlesRAF); revealParticlesRAF = null; }
+  const c = document.getElementById('reveal-particles-canvas');
+  if (c) { const ctx = c.getContext('2d'); ctx.clearRect(0, 0, c.width, c.height); }
 }
 
 function confirmReveal() {
   playSynthClick();
-  if (stopRevealEffect) { stopRevealEffect(); stopRevealEffect = null; }
+  stopRevealParticles();
   document.getElementById('gen-result-reveal').classList.remove('show');
   document.getElementById('reveal-img').classList.remove('reveal-anim');
-  document.getElementById('reveal-mask-canvas').classList.remove('active');
   showResult();
-}
-
-// ════════════════════════════════════════
-//  LOGO
-// ════════════════════════════════════════
-async function addLogo(base64) {
-  const [base, logo] = await Promise.all([loadImg(base64), loadImg(LOGO_URL)]);
-  const c = document.createElement('canvas'); c.width = base.width; c.height = base.height;
-  const ctx = c.getContext('2d'); ctx.drawImage(base, 0, 0);
-  const lw = base.width * 0.25, lh = lw * (logo.height / logo.width), m = base.width * 0.025;
-  ctx.globalAlpha = 1; ctx.drawImage(logo, base.width - lw - m, base.height - lh - m, lw, lh);
-  return c.toDataURL('image/png');
-}
-function loadImg(src) {
-  return new Promise((res, rej) => {
-    const i = new Image(); i.crossOrigin = 'anonymous';
-    i.onload = () => res(i); i.onerror = () => rej();
-    i.src = src;
-  });
 }
 
 // ════════════════════════════════════════
@@ -1628,86 +1429,65 @@ function loadImg(src) {
 // ════════════════════════════════════════
 function showResult() {
   const arch = ARCHETYPES[selectedArch];
-  document.getElementById('result-img').src   = resultImage;
   document.getElementById('res-name-em').textContent   = userName;
   document.getElementById('res-arch-badge').textContent = arch.emoji + ' ' + arch.label;
-  document.getElementById('card-name').textContent     = userName;
-  document.getElementById('card-arch-sub').textContent = arch.label;
-  document.getElementById('card-badge-arch').textContent = arch.label;
 
-  hideStatus(); showScreen('screen-result');
+  hideStatus();
+  showScreen('screen-result');
 
-  requestAnimationFrame(async () => {
-    initParticles();
-    initCardTilt();
+  // Réinitialise l'iframe et lui envoie les nouvelles données
+  cardIframeReady = false;
+  const iframe = getCardIframe();
+  // Recharge l'iframe pour repartir d'un état propre
+  iframe.src = 'card.html';
+  iframe.onload = () => {
+    // On attend un tout petit peu que les scripts s'initialisent
+    setTimeout(() => {
+      sendCardData(resultImage, userName, arch.label);
+    }, 150);
+  };
+
+  requestAnimationFrame(() => {
     loadLeaderboard();
-    loadGallery();   // ← charge le carrousel Drive
-
-    const pulseCanvas = document.getElementById('card-pulse-canvas');
-    const partCanvas  = document.getElementById('card-particles-overlay');
-    await sleep(100);
-    const card = document.getElementById('hero-card');
-    pulseCanvas.width  = card.offsetWidth;  pulseCanvas.height = card.offsetHeight;
-    partCanvas.width   = card.offsetWidth;  partCanvas.height  = card.offsetHeight;
-    if (stopCardEffect) stopCardEffect();
-    stopCardEffect = await startLightEffect(resultImage, pulseCanvas, partCanvas, 50);
+    loadGallery();
   });
 }
 
 // ════════════════════════════════════════
 //  CARROUSEL GALERIE DRIVE
 // ════════════════════════════════════════
-
-/**
- * Charge les images du dossier Drive via Apps Script (action getGallery)
- * et construit le carrousel HTML.
- */
 async function loadGallery() {
   const container = document.getElementById('gallery-inner');
   container.innerHTML = '<div class="gallery-loading">Chargement des avatars…</div>';
-
   try {
     const res = await fetch(API_URL, {
       method: 'POST',
-      headers: {'Content-Type': 'text/plain;charset=utf-8'},
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
       body: JSON.stringify({ action: 'getGallery', secret: SECRET })
-      // Pas de filtre archétype : on affiche toute la galerie du stand
     });
     const data = await res.json();
-
     if (!data.success || !data.images || data.images.length === 0) {
       container.innerHTML = '<div class="gallery-empty">Aucun avatar encore généré aujourd\'hui.</div>';
       return;
     }
-
     buildCarousel(container, data.images);
-
   } catch(e) {
     container.innerHTML = '<div class="gallery-empty">Galerie indisponible.</div>';
   }
 }
 
-/**
- * Construit le HTML du carrousel à partir du tableau d'images.
- * @param {HTMLElement} container
- * @param {Array<{fileId, thumbnailUrl, name, createdAt}>} images
- */
 function buildCarousel(container, images) {
   const carouselId = 'gallery-carousel-' + Date.now();
-
   const items = images.map((img, idx) => {
     const isMine = currentFileId && img.fileId === currentFileId;
     return `
       <div class="gallery-item${isMine ? ' is-mine' : ''}"
            onclick="openLightbox('${img.thumbnailUrl.replace(/&sz=w600/, '&sz=w1200')}')">
-        <img src="${img.thumbnailUrl}"
-             alt="Avatar ${idx + 1}"
-             loading="lazy"
+        <img src="${img.thumbnailUrl}" alt="Avatar ${idx + 1}" loading="lazy"
              onerror="this.parentElement.style.display='none'">
         <div class="gallery-lightbox-hint">🔍</div>
       </div>`;
   }).join('');
-
   container.innerHTML = `
     <div class="gallery-carousel" id="${carouselId}">${items}</div>
     <div class="gallery-nav">
@@ -1719,19 +1499,12 @@ function buildCarousel(container, images) {
     </div>`;
 }
 
-/**
- * Fait défiler le carrousel de N items.
- * @param {string} carouselId
- * @param {number} direction - -1 (gauche) ou +1 (droite)
- */
 function scrollCarousel(carouselId, direction) {
   const el = document.getElementById(carouselId);
   if (!el) return;
-  const itemWidth = 72 + 10; // width + gap
-  el.scrollBy({ left: direction * itemWidth * 3, behavior: 'smooth' });
+  el.scrollBy({ left: direction * (72 + 10) * 3, behavior: 'smooth' });
 }
 
-// ── Lightbox ──
 function openLightbox(url) {
   document.getElementById('gallery-lightbox-img').src = url;
   document.getElementById('gallery-lightbox').classList.add('open');
@@ -1740,94 +1513,7 @@ function closeLightbox() {
   document.getElementById('gallery-lightbox').classList.remove('open');
   document.getElementById('gallery-lightbox-img').src = '';
 }
-// Fermeture clavier
-document.addEventListener('keydown', e => {
-  if (e.key === 'Escape') closeLightbox();
-});
-
-// ════════════════════════════════════════
-//  PARTICULES CANVAS (fond zone gauche)
-// ════════════════════════════════════════
-let particlesRAF = null;
-
-function initParticles() {
-  const canvas    = document.getElementById('particles-canvas');
-  const container = canvas.parentElement;
-  canvas.width  = container.offsetWidth;
-  canvas.height = container.offsetHeight;
-  const ctx = canvas.getContext('2d');
-
-  const N = 38;
-  const particles = Array.from({length: N}, () => ({
-    x: Math.random() * canvas.width,
-    y: Math.random() * canvas.height,
-    r: Math.random() * 2.2 + 0.6,
-    vx: (Math.random() - 0.5) * 0.35,
-    vy: (Math.random() - 0.55) * 0.45,
-    opacity: Math.random() * 0.4 + 0.1,
-    color: Math.random() > 0.6 ? '246,161,25' : '66,133,244'
-  }));
-
-  function draw() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    for (const p of particles) {
-      ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-      ctx.fillStyle = `rgba(${p.color},${p.opacity})`; ctx.fill();
-      p.x += p.vx; p.y += p.vy;
-      if (p.x < 0 || p.x > canvas.width)  p.vx *= -1;
-      if (p.y < 0 || p.y > canvas.height) p.vy *= -1;
-      p.opacity += (Math.random() - 0.5) * 0.012;
-      p.opacity = Math.max(0.05, Math.min(0.55, p.opacity));
-    }
-    particlesRAF = requestAnimationFrame(draw);
-  }
-  draw();
-}
-
-function stopParticles() {
-  if (particlesRAF) { cancelAnimationFrame(particlesRAF); particlesRAF = null; }
-  const canvas = document.getElementById('particles-canvas');
-  if (canvas) { const ctx = canvas.getContext('2d'); ctx.clearRect(0, 0, canvas.width, canvas.height); }
-}
-
-// ════════════════════════════════════════
-//  TILT 3D CARTE
-// ════════════════════════════════════════
-function initCardTilt() {
-  const wrapper = document.getElementById('card-tilt-wrapper');
-  const card    = document.getElementById('hero-card');
-  const shine   = document.getElementById('card-shine');
-
-  let targetRX = 0, targetRY = 0, currentRX = 0, currentRY = 0;
-  function lerp(a, b, t) { return a + (b - a) * t; }
-
-  function animateTilt() {
-    currentRX = lerp(currentRX, targetRX, 0.1);
-    currentRY = lerp(currentRY, targetRY, 0.1);
-    card.style.transform = `rotateX(${currentRX}deg) rotateY(${currentRY}deg) scale(1.02)`;
-    requestAnimationFrame(animateTilt);
-  }
-  animateTilt();
-
-  wrapper.addEventListener('mousemove', (e) => {
-    const rect = wrapper.getBoundingClientRect();
-    const cx = rect.left + rect.width  / 2;
-    const cy = rect.top  + rect.height / 2;
-    targetRY =  ((e.clientX - cx) / (rect.width  / 2)) * 8;
-    targetRX = -((e.clientY - cy) / (rect.height / 2)) * 8;
-    const mx = ((e.clientX - rect.left) / rect.width  * 100).toFixed(1);
-    const my = ((e.clientY - rect.top)  / rect.height * 100).toFixed(1);
-    shine.style.setProperty('--mx', mx + '%');
-    shine.style.setProperty('--my', my + '%');
-  });
-  wrapper.addEventListener('mouseleave', () => {
-    targetRX = 0; targetRY = 0;
-    card.style.boxShadow = '0 20px 60px rgba(38,47,99,0.35), 0 4px 16px rgba(38,47,99,0.15)';
-  });
-  wrapper.addEventListener('mouseenter', () => {
-    card.style.boxShadow = '0 28px 70px rgba(38,47,99,0.45), 0 8px 24px rgba(66,133,244,0.15)';
-  });
-}
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeLightbox(); });
 
 // ════════════════════════════════════════
 //  LEADERBOARD
@@ -1845,24 +1531,20 @@ async function loadLeaderboard() {
   try {
     const res = await fetch(API_URL, {
       method: 'POST',
-      headers: {'Content-Type': 'text/plain;charset=utf-8'},
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
       body: JSON.stringify({ action: 'getStats', secret: SECRET })
     });
     const data = await res.json();
-
     if (!data.success) {
       lbContent.innerHTML = '<div class="lb-loading">Stats indisponibles</div>';
       return;
     }
-
     const sorted = Object.entries(data.counts)
       .map(([k, v]) => ({ key: k, count: v }))
       .sort((a, b) => b.count - a.count);
-
     const maxCount    = sorted[0]?.count || 1;
     const rankLabels  = ['①', '②', '③', '④'];
     const rankClasses = ['gold', 'silver', 'bronze', ''];
-
     let html = '';
     sorted.forEach((item, i) => {
       const isActive = item.key === selectedArch;
@@ -1877,20 +1559,16 @@ async function loadLeaderboard() {
           <span class="lb-count ${isActive ? 'active-count' : ''}">${item.count}</span>
         </div>`;
     });
-
     lbContent.innerHTML = html;
     lbTotal.textContent = `${data.total} avatar${data.total > 1 ? 's' : ''} généré${data.total > 1 ? 's' : ''} aujourd'hui`;
     lbTotal.style.display = 'block';
-
     requestAnimationFrame(() => {
       document.querySelectorAll('.lb-bar').forEach(bar => {
-        const pct = bar.dataset.pct;
-        setTimeout(() => { bar.style.width = pct + '%'; }, 80);
+        setTimeout(() => { bar.style.width = bar.dataset.pct + '%'; }, 80);
       });
     });
-
   } catch(e) {
-    lbContent.innerHTML = '<div class="lb-loading">Stats indisponibles</div>';
+    document.getElementById('lb-content').innerHTML = '<div class="lb-loading">Stats indisponibles</div>';
   }
 }
 
@@ -1901,7 +1579,7 @@ async function sendEmail() {
   setStatus('info', '> Envoi en cours…');
   try {
     const res = await fetch(API_URL, {
-      method: 'POST', headers: {'Content-Type': 'text/plain;charset=utf-8'},
+      method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
       body: JSON.stringify({ action: 'sendEmail', secret: SECRET, email: userEmail, nom: userName, image: resultImage, archetype: selectedArch })
     });
     const d = await res.json();
@@ -1916,18 +1594,23 @@ function setStatus(type, msg) {
 function hideStatus() { document.getElementById('result-status').className = 'result-status'; }
 
 function resetAll(silent) {
-  selectedArch = null; userName = ''; userEmail = ''; capturedB64 = null; resultImage = null; currentFileId = null;
-  if (camStream)           { camStream.getTracks().forEach(t=>t.stop()); camStream = null; }
-  if (countdownInt)        { clearInterval(countdownInt);        countdownInt = null; }
+  selectedArch = null; userName = ''; userEmail = '';
+  capturedB64 = null; resultImage = null; currentFileId = null;
+  cardIframeReady = false;
+  if (camStream)           { camStream.getTracks().forEach(t => t.stop()); camStream = null; }
+  if (countdownInt)        { clearInterval(countdownInt); countdownInt = null; }
   if (genProgressInterval) { clearInterval(genProgressInterval); genProgressInterval = null; }
-  if (loadingMsgInterval)  { clearInterval(loadingMsgInterval);  loadingMsgInterval = null; }
+  if (loadingMsgInterval)  { clearInterval(loadingMsgInterval); loadingMsgInterval = null; }
+  stopRevealParticles();
   document.getElementById('countdown-overlay').classList.remove('show');
   document.getElementById('gen-overlay').classList.remove('show');
   document.getElementById('gen-result-reveal').classList.remove('show');
   document.getElementById('gen-white-flash').className = '';
   document.getElementById('form-overlay').classList.remove('open');
   document.getElementById('gallery-lightbox').classList.remove('open');
-  stopAllParticleEffects();
+  // Réinitialise l'iframe
+  const iframe = getCardIframe();
+  if (iframe) iframe.src = 'card.html';
   if (!silent) showScreen('screen-choose');
 }
 
